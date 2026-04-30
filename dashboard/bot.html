@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyora — Auto Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#020305;--dark:#080b0f;--panel:#0c1018;--border:#141b26;--border2:#1e2a3a;--green:#00ff88;--green2:#00cc6a;--red:#ff3366;--gold:#f0b429;--blue:#0ea5e9;--text:#c8d4e0;--text-dim:#5a6a7a;--text-bright:#eef2f7;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.015) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--text-bright);}
+.sidebar-logo span{color:var(--green);}
+.sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;color:var(--text-dim);font-size:0.82rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.1);}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+.user-avatar{width:32px;height:32px;border-radius:6px;background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;justify-content:center;}
+.user-name{font-size:0.78rem;font-weight:600;color:var(--text-bright);}
+.user-plan{font-size:0.6rem;color:var(--green);}
+.main{flex:1;margin-left:220px;position:relative;z-index:1;}
+.topbar{height:60px;background:rgba(2,3,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:9;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text-bright);}
+.topbar-status{display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--green);background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.15);padding:4px 12px;border-radius:100px;}
+.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.content{padding:28px;}
+
+/* BOT HERO */
+.bot-hero{background:var(--panel);border:1px solid var(--border2);border-radius:12px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden;}
+.bot-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.bh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.bh-info{display:flex;align-items:center;gap:16px;}
+.bh-icon{width:56px;height:56px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;}
+.bh-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--text-bright);letter-spacing:2px;}
+.bh-ver{font-size:0.7rem;color:var(--text-dim);margin-top:2px;}
+.bh-controls{display:flex;gap:10px;}
+.ctrl-btn{padding:10px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;border:none;letter-spacing:1px;transition:all 0.2s;}
+.ctrl-start{background:var(--green);color:var(--black);}
+.ctrl-start:hover{background:var(--green2);}
+.ctrl-stop{background:rgba(255,51,102,0.12);color:var(--red);border:1px solid rgba(255,51,102,0.25);}
+.ctrl-stop:hover{background:rgba(255,51,102,0.2);}
+.ctrl-restart{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border2);}
+.ctrl-restart:hover{border-color:var(--gold);color:var(--gold);}
+
+.bh-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;}
+.bh-stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;}
+.bhs-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;}
+.bhs-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-top:4px;}
+
+/* GRID */
+.bot-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;}
+.panel{background:var(--panel);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);}
+.panel-body{padding:20px;}
+
+/* STRATEGY CONFIG */
+.config-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.config-row:last-child{border-bottom:none;}
+.cfg-label{font-size:0.82rem;font-weight:600;color:var(--text-bright);}
+.cfg-desc{font-size:0.7rem;color:var(--text-dim);margin-top:1px;}
+.cfg-val{font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--green);font-weight:700;}
+
+/* LOG */
+.bot-log{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;height:220px;overflow-y:auto;line-height:1.8;}
+.bot-log::-webkit-scrollbar{width:3px;}
+.bot-log::-webkit-scrollbar-thumb{background:var(--border2);}
+.log-line{color:var(--text-dim);}
+.log-line.info{color:var(--text);}
+.log-line.buy{color:var(--green);}
+.log-line.warn{color:var(--gold);}
+.log-line.error{color:var(--red);}
+
+/* BACKTEST */
+.backtest-card{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:24px;margin-bottom:24px;}
+.bt-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:16px;}
+.bt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.bt-stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center;}
+.bt-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;}
+.bt-label{font-size:0.6rem;color:var(--text-dim);margin-top:3px;}
+.bt-btn{padding:10px 20px;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);color:var(--blue);border-radius:6px;font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700;transition:all 0.2s;}
+.bt-btn:hover{background:rgba(14,165,233,0.2);}
+
+/* SCHEDULE */
+.schedule-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.schedule-item:last-child{border-bottom:none;}
+.sch-time{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text-dim);width:80px;}
+.sch-event{font-size:0.82rem;color:var(--text);}
+.sch-status{margin-left:auto;font-size:0.65rem;padding:2px 8px;border-radius:100px;}
+.sch-done{background:rgba(0,255,136,0.1);color:var(--green);}
+.sch-pending{background:rgba(255,255,255,0.06);color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo">VYORA<span>.</span>TRADE</div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a>
+    <a href="signals.html" class="nav-item"><span>🎯</span> Sinyal Live</a>
+    <a href="bot.html" class="nav-item active"><span>🤖</span> Auto Bot</a>
+    <a href="trades.html" class="nav-item"><span>📋</span> Riwayat Trade</a>
+    <a href="ai-chat.html" class="nav-item"><span>🧠</span> AI Advisor</a>
+    <a href="portfolio.html" class="nav-item"><span>💼</span> Portfolio</a>
+    <a href="settings.html" class="nav-item"><span>⚙️</span> Settings</a>
+    <a href="billing.html" class="nav-item"><span>💳</span> Billing</a>
+    <a href="login.html" class="nav-item"><span>🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div><div class="user-name" id="sidebar-user-name">Loading...</div><div class="user-plan">✦ Trial — 6 hari</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">AUTO BOT</div>
+    <div class="topbar-status" id="bot-status-bar"><div class="dot"></div>Bot Aktif · Running</div>
+  </div>
+  <div class="content">
+
+    <!-- BOT HERO -->
+    <div class="bot-hero">
+      <div class="bh-top">
+        <div class="bh-info">
+          <div class="bh-icon">🤖</div>
+          <div>
+            <div class="bh-name">VYORA BOT v4.0</div>
+            <div class="bh-ver">Python · EMA+RSI+Volume · Binance Spot API</div>
+          </div>
+        </div>
+        <div class="bh-controls">
+          <button class="ctrl-btn ctrl-restart" onclick="restartBot()">↺ Restart</button>
+          <button class="ctrl-btn ctrl-stop" id="stop-btn" onclick="toggleBot()">⏹ Stop Bot</button>
+        </div>
+      </div>
+      <div class="bh-stats">
+        <div class="bh-stat">
+          <div class="bhs-val" style="color:var(--green)" id="bot-cycles">47</div>
+          <div class="bhs-label">Total Cycles</div>
+        </div>
+        <div class="bh-stat">
+          <div class="bhs-val" style="color:var(--blue)">11h 52m</div>
+          <div class="bhs-label">Uptime</div>
+        </div>
+        <div class="bh-stat">
+          <div class="bhs-val" style="color:var(--text-bright)">2</div>
+          <div class="bhs-label">Trade Dieksekusi</div>
+        </div>
+        <div class="bh-stat">
+          <div class="bhs-val" style="color:var(--green)">100%</div>
+          <div class="bhs-label">Win Rate</div>
+        </div>
+        <div class="bh-stat">
+          <div class="bhs-val" style="color:var(--green)">+$0.16</div>
+          <div class="bhs-label">Total PnL</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="bot-grid">
+
+      <!-- STRATEGY -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">⚙️ Konfigurasi Strategi</div>
+          <a href="settings.html" style="font-size:0.7rem;color:var(--green);text-decoration:none">Edit →</a>
+        </div>
+        <div class="panel-body">
+          <div class="config-row">
+            <div><div class="cfg-label">Trading Pair</div><div class="cfg-desc">Crypto yang dipantau</div></div>
+            <div class="cfg-val">BTC/USDT</div>
+          </div>
+          <div class="config-row">
+            <div><div class="cfg-label">Timeframe</div><div class="cfg-desc">Interval analisa</div></div>
+            <div class="cfg-val">15 Menit</div>
+          </div>
+          <div class="config-row">
+            <div><div class="cfg-label">Take Profit</div><div class="cfg-desc">Target profit per trade</div></div>
+            <div class="cfg-val">3.0%</div>
+          </div>
+          <div class="config-row">
+            <div><div class="cfg-label">Stop Loss</div><div class="cfg-desc">Max loss per trade</div></div>
+            <div class="cfg-val">1.5%</div>
+          </div>
+          <div class="config-row">
+            <div><div class="cfg-label">Risk/Trade</div><div class="cfg-desc">Persentase modal per entry</div></div>
+            <div class="cfg-val">90%</div>
+          </div>
+          <div class="config-row">
+            <div><div class="cfg-label">Min Confidence</div><div class="cfg-desc">Ambang batas sinyal</div></div>
+            <div class="cfg-val">MEDIUM+</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOG -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🖥️ Activity Log</div>
+          <div style="font-size:0.7rem;color:var(--green);cursor:pointer" onclick="clearLog()">Clear</div>
+        </div>
+        <div class="panel-body">
+          <div class="bot-log" id="bot-log">
+            <div class="log-line info">[19:49:55] 🚀 AUTO BOT v4.0 STARTED</div>
+            <div class="log-line">[19:49:57] 💰 Balance: $14.0145 USDT</div>
+            <div class="log-line info">[19:49:59] 📈 BTCUSDT | $77,802</div>
+            <div class="log-line">[19:49:59]    EMA20=77,871 | EMA50=78,074</div>
+            <div class="log-line">[19:49:59]    RSI=43.31 | Vol=0.09x</div>
+            <div class="log-line">[19:49:59]    Signal=HOLD | Score=2/7</div>
+            <div class="log-line warn">[20:04:59] ⚠️  Volume rendah (0.09x) — menunggu</div>
+            <div class="log-line info">[20:19:59] 📈 BTCUSDT | $77,834</div>
+            <div class="log-line">[20:19:59]    RSI=45.1 | Vol=0.14x — HOLD</div>
+            <div class="log-line info">[20:34:59] 📈 BTCUSDT | $77,910</div>
+            <div class="log-line">[20:34:59]    RSI=48.2 | Vol=0.31x — HOLD</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKTEST -->
+    <div class="backtest-card">
+      <div class="bt-title">📊 Hasil Backtest (100 Candle Terakhir)</div>
+      <div class="bt-grid">
+        <div class="bt-stat">
+          <div class="bt-val" style="color:var(--green)">58%</div>
+          <div class="bt-label">Win Rate</div>
+        </div>
+        <div class="bt-stat">
+          <div class="bt-val" style="color:var(--green)">+12.4%</div>
+          <div class="bt-label">Total Return</div>
+        </div>
+        <div class="bt-stat">
+          <div class="bt-val" style="color:var(--gold)">1:1.9</div>
+          <div class="bt-label">Risk:Reward</div>
+        </div>
+        <div class="bt-stat">
+          <div class="bt-val" style="color:var(--blue)">7</div>
+          <div class="bt-label">Total Trades</div>
+        </div>
+      </div>
+      <button class="bt-btn" onclick="runBacktest()">▶ Jalankan Backtest Ulang</button>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">📅 Jadwal Bot Hari Ini</div>
+        <div style="font-size:0.65rem;color:var(--text-dim)" id="schedule-date"></div>
+      </div>
+      <div class="panel-body">
+        <div class="schedule-item">
+          <div class="sch-time">07:49 WIB</div>
+          <div class="sch-event">Bot dimulai · Cycle #1</div>
+          <div class="sch-status sch-done">✓ Selesai</div>
+        </div>
+        <div class="schedule-item">
+          <div class="sch-time">08:04 WIB</div>
+          <div class="sch-event">Cycle #2 · HOLD (Volume rendah)</div>
+          <div class="sch-status sch-done">✓ Selesai</div>
+        </div>
+        <div class="schedule-item">
+          <div class="sch-time">21:30 WIB</div>
+          <div class="sch-event">US Market buka · Volume tinggi expected</div>
+          <div class="sch-status sch-pending">○ Menunggu</div>
+        </div>
+        <div class="schedule-item">
+          <div class="sch-time">22:00 WIB</div>
+          <div class="sch-event">Peak trading hours · Sinyal paling akurat</div>
+          <div class="sch-status sch-pending">○ Menunggu</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let botRunning = true;
+let cycleCount = 47;
+
+function toggleBot() {
+  botRunning = !botRunning;
+  const btn = document.getElementById('stop-btn');
+  const status = document.getElementById('bot-status-bar');
+
+  if(botRunning) {
+    btn.className = 'ctrl-btn ctrl-stop';
+    btn.textContent = '⏹ Stop Bot';
+    status.innerHTML = '<div class="dot"></div>Bot Aktif · Running';
+    status.style.color = 'var(--green)';
+    addLog('🚀 Bot dimulai kembali', 'buy');
+  } else {
+    btn.className = 'ctrl-btn ctrl-start';
+    btn.textContent = '▶ Start Bot';
+    status.innerHTML = '⏹ Bot Stopped';
+    status.style.color = 'var(--red)';
+    addLog('⏹ Bot dihentikan oleh user', 'warn');
+  }
+}
+
+function restartBot() {
+  addLog('↺ Restart bot...', 'warn');
+  setTimeout(() => { addLog('✅ Bot berhasil di-restart', 'buy'); }, 1500);
+}
+
+function addLog(msg, type='') {
+  const log = document.getElementById('bot-log');
+  const now = new Date().toLocaleTimeString('id');
+  const div = document.createElement('div');
+  div.className = 'log-line '+type;
+  div.textContent = `[${now}] ${msg}`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('bot-log').innerHTML = '';
+  addLog('Log cleared', 'info');
+}
+
+function runBacktest() {
+  addLog('📊 Menjalankan backtest...', 'info');
+  setTimeout(() => addLog('✅ Backtest selesai: Win Rate 58%, Return +12.4%', 'buy'), 2000);
+}
+
+// Auto cycle counter
+setInterval(() => {
+  if(botRunning) {
+    cycleCount++;
+    document.getElementById('bot-cycles').textContent = cycleCount;
+    addLog(`🔄 Cycle #${cycleCount} — Menganalisa BTCUSDT...`, 'info');
+  }
+}, 15 * 60 * 1000);
+
+document.getElementById('schedule-date').textContent = new Date().toLocaleDateString('id',{weekday:'long',day:'numeric',month:'long'});
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
+</script>
+<footer style="text-align:center;padding:20px;font-size:0.65rem;color:#3a4a5a;letter-spacing:2px;text-transform:uppercase;border-top:1px solid #141b26;margin-top:40px">Vyora by J-CUBE | All Digital In One Cube · Bali, Indonesia · 2026</footer>
+</body>
+</html>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){window.location.href='login.html';return;}
+  const snap=await getDoc(doc(db,'users',u.uid));
+  if(snap.exists()){
+    const d=snap.data();
+    const nm=document.getElementById('sidebar-user-name');
+    const pl=document.getElementById('sidebar-user-plan');
+    if(nm)nm.textContent=d.name||u.email;
+    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+  }
+});
+window.doLogout=async()=>{
+  if(confirm('Yakin mau logout?')){
+    await signOut(auth);
+    window.location.href='login.html';
+  }
+};
+</script>

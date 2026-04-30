@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyora — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#020305;--dark:#080b0f;--panel:#0c1018;--panel2:#0f151e;
+  --border:#141b26;--border2:#1e2a3a;
+  --green:#00ff88;--green2:#00cc6a;--red:#ff3366;--gold:#f0b429;
+  --blue:#0ea5e9;--purple:#8b5cf6;
+  --text:#c8d4e0;--text-dim:#5a6a7a;--text-bright:#eef2f7;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{height:100%;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
+
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.015) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10;transition:transform 0.3s;}
+
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--text-bright);}
+.sidebar-logo span{color:var(--green);}
+
+.sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px;}
+
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;color:var(--text-dim);font-size:0.82rem;font-weight:500;text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.1);}
+.nav-icon{font-size:1rem;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--green);color:var(--black);font-size:0.55rem;font-weight:700;padding:2px 6px;border-radius:100px;}
+
+.sidebar-section{font-size:0.55rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-dim);padding:12px 12px 6px;margin-top:8px;}
+
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+.user-avatar{width:32px;height:32px;border-radius:6px;background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+.user-name{font-size:0.78rem;font-weight:600;color:var(--text-bright);}
+.user-plan{font-size:0.6rem;color:var(--green);}
+
+/* MAIN */
+.main{flex:1;margin-left:220px;display:flex;flex-direction:column;position:relative;z-index:1;}
+
+/* TOP BAR */
+.topbar{height:60px;background:rgba(2,3,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:9;}
+.topbar-left{display:flex;align-items:center;gap:16px;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text-bright);}
+.topbar-status{display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--green);background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.15);padding:4px 12px;border-radius:100px;}
+.status-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-btn{background:transparent;border:1px solid var(--border2);color:var(--text-dim);padding:6px 14px;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:0.72rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.topbar-btn:hover{border-color:var(--green);color:var(--green);}
+.topbar-btn.primary{background:var(--green);color:var(--black);border-color:var(--green);font-weight:700;}
+.topbar-btn.primary:hover{background:var(--green2);}
+
+/* CONTENT */
+.content{padding:28px;display:flex;flex-direction:column;gap:24px;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.stat-card{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.stat-card:hover{border-color:var(--border2);}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-green::before{background:var(--green);}
+.stat-red::before{background:var(--red);}
+.stat-blue::before{background:var(--blue);}
+.stat-gold::before{background:var(--gold);}
+
+.stat-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:10px;}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;line-height:1;}
+.stat-sub{font-size:0.7rem;color:var(--text-dim);margin-top:6px;display:flex;align-items:center;gap:4px;}
+.stat-sub .up{color:var(--green);}
+.stat-sub .down{color:var(--red);}
+
+/* BOT STATUS */
+.bot-status-card{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:24px;display:flex;align-items:center;justify-content:space-between;}
+.bot-info{display:flex;align-items:center;gap:16px;}
+.bot-icon{width:48px;height:48px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.bot-name{font-size:1rem;font-weight:700;color:var(--text-bright);margin-bottom:4px;}
+.bot-desc{font-size:0.75rem;color:var(--text-dim);}
+.bot-stats{display:flex;gap:24px;}
+.bot-stat{text-align:center;}
+.bot-stat-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--text-bright);}
+.bot-stat-label{font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.bot-controls{display:flex;gap:10px;}
+.bot-btn{padding:10px 20px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;border:none;transition:all 0.2s;letter-spacing:1px;}
+.bot-btn-start{background:var(--green);color:var(--black);}
+.bot-btn-start:hover{background:var(--green2);}
+.bot-btn-stop{background:rgba(255,51,102,0.15);color:var(--red);border:1px solid rgba(255,51,102,0.3);}
+.bot-btn-stop:hover{background:rgba(255,51,102,0.25);}
+
+/* GRID 2 COL */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+
+/* PANEL */
+.panel{background:var(--panel);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);}
+.panel-action{font-size:0.7rem;color:var(--green);cursor:pointer;text-decoration:none;}
+.panel-body{padding:20px;}
+
+/* SIGNAL DISPLAY */
+.signal-big{text-align:center;padding:24px 20px;}
+.signal-tag{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;letter-spacing:4px;margin-bottom:4px;}
+.signal-conf{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px;}
+.signal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sig-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:left;}
+.sig-box-label{font-size:0.58rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:5px;}
+.sig-box-val{font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:700;}
+.sig-indicators{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.sig-ind{padding:3px 10px;border-radius:100px;font-size:0.62rem;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);}
+.sig-ind.ok{color:var(--green);border-color:rgba(0,255,136,0.2);}
+.sig-refresh{margin-top:16px;}
+.sig-refresh-btn{width:100%;padding:10px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);color:var(--green);border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.2s;letter-spacing:1px;text-transform:uppercase;}
+.sig-refresh-btn:hover{background:rgba(0,255,136,0.15);}
+
+/* TRADE HISTORY */
+.trade-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);transition:background 0.2s;}
+.trade-row:hover{background:rgba(255,255,255,0.02);}
+.trade-row:last-child{border-bottom:none;}
+.trade-side-badge{padding:3px 10px;border-radius:3px;font-size:0.6rem;font-weight:700;letter-spacing:1px;}
+.badge-buy{background:rgba(0,255,136,0.15);color:var(--green);}
+.badge-sell-tp{background:rgba(0,255,136,0.1);color:var(--green);}
+.badge-sell-sl{background:rgba(255,51,102,0.15);color:var(--red);}
+.trade-pair{font-size:0.82rem;font-weight:600;color:var(--text-bright);margin:0 12px;}
+.trade-price{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text-dim);}
+.trade-pnl{font-family:'JetBrains Mono',monospace;font-size:0.82rem;font-weight:700;}
+.trade-time{font-size:0.65rem;color:var(--text-dim);}
+
+/* CHART AREA */
+.chart-area{height:160px;display:flex;align-items:flex-end;gap:3px;padding:0 20px 16px;}
+.chart-bar{flex:1;border-radius:3px 3px 0 0;transition:height 0.5s ease;min-height:4px;cursor:pointer;opacity:0.7;}
+.chart-bar:hover{opacity:1;}
+.chart-bar.pos{background:linear-gradient(180deg,var(--green),var(--green2));}
+.chart-bar.neg{background:linear-gradient(180deg,var(--red),#cc2244);}
+
+/* OPEN POSITION */
+.open-pos{padding:20px;}
+.pos-empty{text-align:center;padding:32px;color:var(--text-dim);font-size:0.82rem;}
+.pos-card{background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);border-radius:8px;padding:16px;}
+.pos-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.pos-pair{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--text-bright);}
+.pos-pnl{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;}
+.pos-details{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pos-detail{text-align:center;background:rgba(0,0,0,0.3);border-radius:4px;padding:8px;}
+.pos-d-label{font-size:0.55rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);}
+.pos-d-val{font-family:'JetBrains Mono',monospace;font-size:0.78rem;margin-top:3px;}
+.pos-actions{display:flex;gap:8px;margin-top:12px;}
+.pos-btn{flex:1;padding:8px;border-radius:4px;font-size:0.72rem;font-weight:700;cursor:pointer;border:none;letter-spacing:1px;}
+
+/* AI CHAT */
+.chat-container{height:280px;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.chat-container::-webkit-scrollbar{width:3px;}
+.chat-container::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.chat-msg-wrap{display:flex;gap:10px;align-items:flex-start;}
+.chat-avatar{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;}
+.chat-avatar.ai{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);}
+.chat-avatar.user{background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);}
+.chat-bubble{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:0.78rem;line-height:1.6;max-width:85%;}
+.chat-bubble.ai{background:rgba(0,255,136,0.04);border-color:rgba(0,255,136,0.1);}
+.chat-bubble strong{color:var(--text-bright);}
+.chat-input-area{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;}
+.chat-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:6px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none;}
+.chat-input:focus{border-color:var(--green);}
+.chat-send{background:var(--green);color:var(--black);border:none;border-radius:6px;padding:10px 16px;font-size:0.8rem;font-weight:700;cursor:pointer;}
+
+/* MULTI PAIR */
+.pair-row{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);}
+.pair-row:last-child{border-bottom:none;}
+.pair-name-val{font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--text-bright);}
+.pair-price-val{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text);}
+.pair-signal{padding:3px 10px;border-radius:3px;font-size:0.6rem;font-weight:700;letter-spacing:1px;}
+
+/* PROGRESS BAR */
+.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green2),var(--green));}
+
+/* BOT LOG */
+.log-terminal{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;height:150px;overflow-y:auto;line-height:1.8;}
+.log-terminal::-webkit-scrollbar{width:3px;}
+.log-terminal::-webkit-scrollbar-thumb{background:var(--border2);}
+.log-line{color:var(--text-dim);}
+.log-line.buy{color:var(--green);}
+.log-line.sell{color:var(--red);}
+.log-line.info{color:var(--text);}
+.log-line.warn{color:var(--gold);}
+
+/* PLAN CARD */
+.plan-banner{background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,255,136,0.02));border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.plan-info h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text-bright);margin-bottom:4px;}
+.plan-info p{font-size:0.78rem;color:var(--text-dim);}
+.plan-days{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--green);letter-spacing:2px;text-align:center;}
+.plan-days-label{font-size:0.62rem;color:var(--text-dim);text-align:center;}
+.upgrade-btn{background:var(--green);color:var(--black);border:none;border-radius:6px;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;letter-spacing:1px;}
+
+@media(max-width:1200px){.grid-2,.grid-3{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.stats-row{grid-template-columns:1fr 1fr;}.bot-stats{display:none;}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">VYORA<span>.</span>TRADE</div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Main</div>
+    <a href="dashboard.html" class="nav-item active">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a href="signals.html" class="nav-item">
+      <span class="nav-icon">🎯</span> Sinyal Live
+      <span class="nav-badge">3</span>
+    </a>
+    <a href="bot.html" class="nav-item">
+      <span class="nav-icon">🤖</span> Auto Bot
+    </a>
+    <a href="trades.html" class="nav-item">
+      <span class="nav-icon">📋</span> Riwayat Trade
+    </a>
+
+    <div class="sidebar-section">Tools</div>
+    <a href="ai-chat.html" class="nav-item">
+      <span class="nav-icon">🧠</span> AI Advisor
+    </a>
+    <a href="portfolio.html" class="nav-item">
+      <span class="nav-icon">💼</span> Portfolio
+    </a>
+    <a href="alerts.html" class="nav-item">
+      <span class="nav-icon">🔔</span> Price Alerts
+    </a>
+
+    <div class="sidebar-section">Account</div>
+    <a href="settings.html" class="nav-item">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+    <a href="billing.html" class="nav-item">
+      <span class="nav-icon">💳</span> Billing
+    </a>
+    <a href="login.html" class="nav-item">
+      <span class="nav-icon">🚪</span> Logout
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div>
+        <div class="user-name" id="sidebar-user-name">Loading...</div>
+        <div class="user-plan" id="sidebar-user-plan">✦ Trial</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title">DASHBOARD</div>
+      <div class="topbar-status">
+        <div class="status-dot"></div>
+        Bot Aktif · Cycle #47
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn">📥 Export</button>
+      <button class="topbar-btn">🔔 <span id="notif-count">3</span></button>
+      <button class="topbar-btn primary" onclick="window.location.href='billing.html'">⬆ Upgrade Pro</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- PLAN BANNER -->
+    <div class="plan-banner">
+      <div class="plan-info">
+        <h3>🎁 FREE TRIAL AKTIF</h3>
+        <p>Nikmati semua fitur Premium selama trial. Upgrade sekarang untuk akses penuh tanpa batas.</p>
+      </div>
+      <div>
+        <div class="plan-days" id="trial-days">6</div>
+        <div class="plan-days-label">Hari tersisa</div>
+      </div>
+      <button class="upgrade-btn" onclick="window.location.href='billing.html'">Upgrade ke Pro →</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card stat-green">
+        <div class="stat-label">Total Profit</div>
+        <div class="stat-value" style="color:var(--green)" id="total-profit">--</div>
+        <div class="stat-sub"><span class="up">▲</span> +0.29% dari modal awal</div>
+      </div>
+      <div class="stat-card stat-blue">
+        <div class="stat-label">Balance USDT</div>
+        <div class="stat-value" style="color:var(--blue)" id="balance-val">--</div>
+        <div class="stat-sub">Available untuk trading</div>
+      </div>
+      <div class="stat-card stat-gold">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value" style="color:var(--gold)">100%</div>
+        <div class="stat-sub">1 Win · 0 Loss (total 1 trade)</div>
+      </div>
+      <div class="stat-card stat-red">
+        <div class="stat-label">Posisi Terbuka</div>
+        <div class="stat-value" style="color:var(--text-bright)" id="open-pos-count">0</div>
+        <div class="stat-sub">Max 1 posisi (Pro: 3)</div>
+      </div>
+    </div>
+
+    <!-- BOT STATUS -->
+    <div class="bot-status-card">
+      <div class="bot-info">
+        <div class="bot-icon">🤖</div>
+        <div>
+          <div class="bot-name">VYORA BOT v4.0</div>
+          <div class="bot-desc">BTC/USDT · 15m · EMA+RSI+Volume · TP 3% · SL 1.5%</div>
+        </div>
+      </div>
+      <div class="bot-stats">
+        <div class="bot-stat">
+          <div class="bot-stat-val" id="cycles">47</div>
+          <div class="bot-stat-label">Cycles</div>
+        </div>
+        <div class="bot-stat">
+          <div class="bot-stat-val">11h 45m</div>
+          <div class="bot-stat-label">Uptime</div>
+        </div>
+        <div class="bot-stat">
+          <div class="bot-stat-val" style="color:var(--green)">AKTIF</div>
+          <div class="bot-stat-label">Status</div>
+        </div>
+      </div>
+      <div class="bot-controls">
+        <button class="bot-btn bot-btn-stop" onclick="stopBot()">⏹ Stop</button>
+        <button class="bot-btn bot-btn-start" onclick="startBot()" style="display:none" id="start-btn">▶ Start</button>
+      </div>
+    </div>
+
+    <!-- GRID: Signal + Open Position -->
+    <div class="grid-2">
+
+      <!-- AI SIGNAL -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🎯 AI Signal Terkini</div>
+          <div class="panel-action" onclick="refreshSignal()">↻ Refresh</div>
+        </div>
+        <div class="signal-big">
+          <div class="signal-tag" id="sig-tag" style="color:var(--green)">BUY</div>
+          <div class="signal-conf" id="sig-conf" style="color:var(--green)">HIGH CONFIDENCE · 87%</div>
+          <div class="signal-grid">
+            <div class="sig-box">
+              <div class="sig-box-label">Harga BTC</div>
+              <div class="sig-box-val" id="sig-price" style="color:var(--text-bright)">$77,850</div>
+            </div>
+            <div class="sig-box">
+              <div class="sig-box-label">RSI (14)</div>
+              <div class="sig-box-val" id="sig-rsi" style="color:var(--gold)">52.4</div>
+            </div>
+            <div class="sig-box">
+              <div class="sig-box-label">Take Profit</div>
+              <div class="sig-box-val" id="sig-tp" style="color:var(--green)">$80,185</div>
+            </div>
+            <div class="sig-box">
+              <div class="sig-box-label">Stop Loss</div>
+              <div class="sig-box-val" id="sig-sl" style="color:var(--red)">$76,682</div>
+            </div>
+          </div>
+          <div class="sig-indicators">
+            <span class="sig-ind ok" id="ind-ema">EMA ✓</span>
+            <span class="sig-ind ok" id="ind-rsi">RSI ✓</span>
+            <span class="sig-ind" id="ind-vol">VOL ✗</span>
+            <span class="sig-ind ok" id="ind-ma200">MA200 ✓</span>
+          </div>
+          <div class="sig-refresh">
+            <button class="sig-refresh-btn" onclick="refreshSignal()">🔄 Analisa Ulang</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPEN POSITION -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📍 Posisi Terbuka</div>
+          <div class="panel-action" id="pos-action">—</div>
+        </div>
+        <div class="open-pos" id="open-pos-area">
+          <div class="pos-empty">
+            Tidak ada posisi terbuka<br>
+            <span style="font-size:0.72rem;opacity:0.6">Bot akan entry otomatis saat sinyal kuat</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID: Chart + Pairs -->
+    <div class="grid-3">
+
+      <!-- PROFIT CHART -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📈 Profit History (30 Hari)</div>
+          <div style="display:flex;gap:8px">
+            <span style="font-size:0.65rem;color:var(--text-dim);cursor:pointer" onclick="changeChart('7d')">7D</span>
+            <span style="font-size:0.65rem;color:var(--green);cursor:pointer" onclick="changeChart('30d')">30D</span>
+          </div>
+        </div>
+        <div class="chart-area" id="profit-chart"></div>
+        <div style="display:flex;justify-content:space-between;padding:0 20px 16px;font-size:0.65rem;color:var(--text-dim)">
+          <span>1 Apr</span><span>7 Apr</span><span>14 Apr</span><span>21 Apr</span><span>27 Apr</span>
+        </div>
+      </div>
+
+      <!-- MULTI PAIR -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🔥 Top Pairs</div>
+        </div>
+        <div id="pairs-list">
+          <div class="pair-row">
+            <div><div class="pair-name-val">BTC/USDT</div><div class="pair-price-val" id="btc-pr">$77,850</div></div>
+            <div style="text-align:center"><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:87%"></div></div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:3px">87%</div></div>
+            <div class="pair-signal badge-buy">BUY</div>
+          </div>
+          <div class="pair-row">
+            <div><div class="pair-name-val">ETH/USDT</div><div class="pair-price-val">$3,842</div></div>
+            <div style="text-align:center"><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:72%"></div></div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:3px">72%</div></div>
+            <div class="pair-signal badge-buy">BUY</div>
+          </div>
+          <div class="pair-row">
+            <div><div class="pair-name-val">BNB/USDT</div><div class="pair-price-val">$612</div></div>
+            <div style="text-align:center"><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:45%;background:var(--gold)"></div></div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:3px">45%</div></div>
+            <div class="pair-signal" style="background:rgba(255,215,0,0.1);color:var(--gold)">HOLD</div>
+          </div>
+          <div class="pair-row">
+            <div><div class="pair-name-val">SOL/USDT</div><div class="pair-price-val">$168</div></div>
+            <div style="text-align:center"><div class="prog-bar" style="width:80px"><div class="prog-fill" style="width:38%;background:var(--gold)"></div></div><div style="font-size:0.6rem;color:var(--text-dim);margin-top:3px">38%</div></div>
+            <div class="pair-signal" style="background:rgba(255,215,0,0.1);color:var(--gold)">HOLD</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID: Trade History + AI Chat -->
+    <div class="grid-2">
+
+      <!-- TRADE HISTORY -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📋 Riwayat Trade</div>
+          <a href="trades.html" class="panel-action">Lihat semua →</a>
+        </div>
+        <div id="trade-history">
+          <div class="trade-row">
+            <div class="trade-side-badge badge-sell-tp">SELL TP</div>
+            <div class="trade-pair">BTC/USDT</div>
+            <div class="trade-price">$78,316.45</div>
+            <div class="trade-pnl" style="color:var(--green)">+$0.043</div>
+            <div class="trade-time">27 Apr 03:23</div>
+          </div>
+          <div class="trade-row">
+            <div class="trade-side-badge badge-buy">BUY</div>
+            <div class="trade-pair">BTC/USDT</div>
+            <div class="trade-price">$77,619.99</div>
+            <div class="trade-pnl" style="color:var(--text-dim)">—</div>
+            <div class="trade-time">26 Apr 07:44</div>
+          </div>
+          <div class="trade-row">
+            <div class="trade-side-badge badge-sell-tp">SELL TP</div>
+            <div class="trade-pair">BTC/USDT</div>
+            <div class="trade-price">$76,359.23</div>
+            <div class="trade-pnl" style="color:var(--green)">+$0.12</div>
+            <div class="trade-time">21 Apr 20:26</div>
+          </div>
+          <div class="trade-row">
+            <div class="trade-side-badge badge-buy">BUY</div>
+            <div class="trade-pair">BTC/USDT</div>
+            <div class="trade-price">$74,578.30</div>
+            <div class="trade-pnl" style="color:var(--text-dim)">—</div>
+            <div class="trade-time">14 Apr 21:35</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI CHAT -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🧠 AI Trading Advisor</div>
+          <div style="font-size:0.62rem;color:var(--green)">● Online</div>
+        </div>
+        <div class="chat-container" id="chat-container">
+          <div class="chat-msg-wrap">
+            <div class="chat-avatar ai">🤖</div>
+            <div class="chat-bubble ai">
+              Halo! Saya AI Trading Advisor kamu. Tanya apapun tentang market, strategi, atau analisa BTC sekarang!
+            </div>
+          </div>
+          <div class="chat-msg-wrap">
+            <div class="chat-avatar ai">🤖</div>
+            <div class="chat-bubble ai">
+              <strong>📊 Update Market:</strong> BTC sedang dalam fase konsolidasi setelah koreksi dari $79,485. RSI mendekati oversold (~43) — potensi reversal dalam 2-4 jam ke depan jika volume meningkat.
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" class="chat-input" id="chat-input" placeholder="Tanya tentang BTC, strategi, dll..." onkeypress="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT LOG -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🖥️ Bot Activity Log</div>
+        <div class="panel-action" onclick="clearLog()">Clear</div>
+      </div>
+      <div style="padding:16px 20px">
+        <div class="log-terminal" id="bot-log">
+          <div class="log-line info">[19:49:55] 🚀 AUTO BOT v4.0 STARTED</div>
+          <div class="log-line">[19:49:57] 💰 Balance: $14.0145 USDT</div>
+          <div class="log-line info">[19:49:59] 📈 BTCUSDT | $77,802.86</div>
+          <div class="log-line">[19:49:59]    EMA20=$77,871 | EMA50=$78,074</div>
+          <div class="log-line">[19:49:59]    RSI=43.31 | Vol=0.09x</div>
+          <div class="log-line">[19:49:59]    Signal=HOLD | Score=2/7</div>
+          <div class="log-line">[20:04:59] 🔄 Cycle #2</div>
+          <div class="log-line info">[20:04:61] 📈 BTCUSDT | $77,834.21</div>
+          <div class="log-line">[20:04:61]    RSI=45.12 | Vol=0.14x</div>
+          <div class="log-line">[20:04:61]    Signal=HOLD | Score=2/7</div>
+          <div class="log-line">[20:19:61] 🔄 Cycle #3</div>
+          <div class="log-line warn">[20:19:63]    Vol=0.08x — Menunggu volume naik...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Live Price ──────────────────────────────────
+async function updatePrices() {
+  try {
+    const r = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+    const d = await r.json();
+    const price = parseFloat(d.lastPrice);
+    const priceStr = price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+    document.getElementById('sig-price').textContent = '$'+priceStr;
+    document.getElementById('btc-pr').textContent = '$'+priceStr;
+
+    // Update TP/SL
+    document.getElementById('sig-tp').textContent = '$'+(price*1.03).toLocaleString('en',{maximumFractionDigits:0});
+    document.getElementById('sig-sl').textContent = '$'+(price*0.985).toLocaleString('en',{maximumFractionDigits:0});
+  } catch(e){}
+}
+
+// ── Signal Refresh ──────────────────────────────
+async function refreshSignal() {
+  document.getElementById('sig-tag').textContent = '...';
+  try {
+    const r = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=15m&limit=100');
+    const d = await r.json();
+    const closes = d.map(c => parseFloat(c[4]));
+    const vols = d.map(c => parseFloat(c[5]));
+
+    const rsi = calcRSI(closes);
+    const ema20 = calcEMA(closes, 20);
+    const ema50 = calcEMA(closes, 50);
+    const avgVol = vols.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
+    const curVol = vols[vols.length-1];
+    const volRatio = curVol/avgVol;
+    const uptrend = ema20 > ema50;
+
+    let score = 0;
+    if(uptrend) score += 2;
+    if(rsi >= 35 && rsi <= 75) score += 2;
+    if(volRatio >= 0.8) score += 2;
+    score += 1; // MA200 simplified
+
+    const signal = score >= 5 && uptrend ? 'BUY' : 'HOLD';
+    const conf = score >= 5 ? 'HIGH' : score >= 3 ? 'MEDIUM' : 'LOW';
+    const confPct = Math.round(score/7*100);
+
+    const sigEl = document.getElementById('sig-tag');
+    sigEl.textContent = signal;
+    sigEl.style.color = signal==='BUY' ? 'var(--green)' : 'var(--gold)';
+
+    const confEl = document.getElementById('sig-conf');
+    confEl.textContent = `${conf} CONFIDENCE · ${confPct}%`;
+    confEl.style.color = conf==='HIGH' ? 'var(--green)' : conf==='MEDIUM' ? 'var(--gold)' : 'var(--text-dim)';
+
+    document.getElementById('sig-rsi').textContent = rsi.toFixed(1);
+    document.getElementById('ind-ema').className = 'sig-ind '+(uptrend?'ok':'');
+    document.getElementById('ind-ema').textContent = 'EMA '+(uptrend?'✓':'✗');
+    document.getElementById('ind-rsi').className = 'sig-ind '+(rsi>=35&&rsi<=75?'ok':'');
+    document.getElementById('ind-vol').className = 'sig-ind '+(volRatio>=0.8?'ok':'');
+    document.getElementById('ind-vol').textContent = 'VOL '+(volRatio>=0.8?'✓':'✗');
+
+  } catch(e){ document.getElementById('sig-tag').textContent = 'ERR'; }
+}
+
+function calcEMA(closes, period) {
+  if(closes.length < period) return closes[closes.length-1];
+  const k = 2/(period+1);
+  let ema = closes.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<closes.length;i++) ema = closes[i]*k+ema*(1-k);
+  return ema;
+}
+
+function calcRSI(closes, period=14) {
+  if(closes.length < period+1) return 50;
+  const gains=[],losses=[];
+  for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}
+  let ag=gains.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  let al=losses.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<gains.length;i++){ag=(ag*(period-1)+gains[i])/period;al=(al*(period-1)+losses[i])/period;}
+  if(al===0) return 100;
+  return 100-(100/(1+ag/al));
+}
+
+// ── Bot Control ─────────────────────────────────
+let botRunning = true;
+function stopBot() {
+  botRunning = false;
+  document.querySelector('.bot-btn-stop').style.display = 'none';
+  document.getElementById('start-btn').style.display = 'block';
+  document.querySelector('.topbar-status').style.color = 'var(--red)';
+  document.querySelector('.topbar-status').innerHTML = '<div style="width:6px;height:6px;background:var(--red);border-radius:50%"></div> Bot Stopped';
+  addLog('[SYSTEM] Bot dihentikan oleh user', 'warn');
+}
+function startBot() {
+  botRunning = true;
+  document.getElementById('start-btn').style.display = 'none';
+  document.querySelector('.bot-btn-stop').style.display = 'block';
+  document.querySelector('.topbar-status').style.color = 'var(--green)';
+  document.querySelector('.topbar-status').innerHTML = '<div class="status-dot"></div> Bot Aktif · Cycle #'+document.getElementById('cycles').textContent;
+  addLog('[SYSTEM] Bot dimulai kembali', 'buy');
+}
+
+// ── Bot Log ─────────────────────────────────────
+let cycleCount = 47;
+function addLog(msg, type='') {
+  const log = document.getElementById('bot-log');
+  const now = new Date().toLocaleTimeString('id');
+  const div = document.createElement('div');
+  div.className = 'log-line '+type;
+  div.textContent = `[${now}] ${msg}`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function clearLog() {
+  document.getElementById('bot-log').innerHTML = '';
+  addLog('Log cleared', 'info');
+}
+
+// Auto log update
+if(botRunning) {
+  setInterval(() => {
+    if(!botRunning) return;
+    cycleCount++;
+    document.getElementById('cycles').textContent = cycleCount;
+    addLog(`🔄 Cycle #${cycleCount} — Menganalisa BTCUSDT...`, 'info');
+  }, 15 * 60 * 1000); // setiap 15 menit
+}
+
+// ── AI Chat ─────────────────────────────────────
+const aiResponses = [
+  'Berdasarkan analisa real-time, RSI BTC saat ini di zona netral (~43-52). Ini menandakan market sedang dalam fase akumulasi sebelum breakout.',
+  'Volume trading masih rendah jam segini. Biasanya market lebih aktif jam 21:30 WIB saat US market buka. Saran saya tunggu konfirmasi volume dulu.',
+  'EMA20 masih di bawah EMA50 — ini menandakan downtrend jangka pendek. Tapi jika melihat timeframe 4H, trend masih bullish. Sabar adalah strategi terbaik.',
+  'Untuk modal $14, bot akan menggunakan 90% ($12.6) untuk entry jika sinyal HIGH muncul. Risk per trade hanya 1.5% dari total modal.',
+  'Take Profit di +3% dan Stop Loss di -1.5% memberikan Risk:Reward ratio 1:2 — ini standar minimum untuk trading yang sehat dan sustainable.',
+];
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  const container = document.getElementById('chat-container');
+
+  // User message
+  const userDiv = document.createElement('div');
+  userDiv.className = 'chat-msg-wrap';
+  userDiv.style.flexDirection = 'row-reverse';
+  userDiv.innerHTML = `<div class="chat-avatar user">👤</div><div class="chat-bubble" style="text-align:right">${msg}</div>`;
+  container.appendChild(userDiv);
+
+  input.value = '';
+
+  // AI response
+  setTimeout(() => {
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'chat-msg-wrap';
+    const resp = aiResponses[Math.floor(Math.random()*aiResponses.length)];
+    aiDiv.innerHTML = `<div class="chat-avatar ai">🤖</div><div class="chat-bubble ai">${resp}</div>`;
+    container.appendChild(aiDiv);
+    container.scrollTop = container.scrollHeight;
+  }, 800);
+
+  container.scrollTop = container.scrollHeight;
+}
+
+// ── Profit Chart ────────────────────────────────
+function renderChart() {
+  const data = [-2,1,3,-1,2,4,1,3,5,2,4,3,6,2,1,4,3,5,2,4,3,2,5,4,3,6,2,4,3,4];
+  const max = Math.max(...data.map(Math.abs));
+  const container = document.getElementById('profit-chart');
+  container.innerHTML = data.map(v => {
+    const h = Math.max((Math.abs(v)/max)*100, 8);
+    return `<div class="chart-bar ${v>=0?'pos':'neg'}" style="height:${h}%" title="${v>=0?'+':''}${v}%"></div>`;
+  }).join('');
+}
+
+function changeChart(period) { renderChart(); }
+
+// ── Init ────────────────────────────────────────
+updatePrices();
+refreshSignal();
+renderChart();
+setInterval(updatePrices, 30000);
+setInterval(refreshSignal, 15*60*1000);
+</script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){if(!window._loggingOut)window.location.replace('login.html');return;}
+  const nm=document.getElementById('sidebar-user-name');
+  const pl=document.getElementById('sidebar-user-plan');
+  const displayName=u.displayName||u.email.split('@')[0]||'User';
+  if(nm)nm.textContent=u.uid;
+  if(pl)pl.textContent='\u2756 TRIAL';
+  try{
+    const {setDoc}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const snap=await getDoc(doc(db,'users',u.uid));
+    if(!snap.exists()){
+      await setDoc(doc(db,'users',u.uid),{
+        uid:u.uid,email:u.email,
+        name:u.displayName||u.email.split('@')[0],
+        plan:'trial',
+        trialEndsAt:new Date(Date.now()+7*864e5).toISOString(),
+        createdAt:new Date().toISOString(),
+        totalPnl:0,totalTrades:0
+      });
+    }
+    const d=snap.exists()?snap.data():(await getDoc(doc(db,'users',u.uid))).data();
+    if(d){
+      if(nm)nm.textContent=d.name||u.displayName||u.email.split('@')[0];
+      if(pl)pl.textContent='\u2756 '+(d.plan||'trial').toUpperCase();
+      const pb=document.getElementById('total-profit');
+      const bv=document.getElementById('balance-val');
+      if(pb)pb.textContent='$'+(d.totalPnl||0).toFixed(4);
+      if(bv)bv.textContent='$'+(d.totalUsdt||0).toFixed(2);
+    // Update plan banner
+    if(d.plan==='trial'&&d.trialEndsAt){
+      const ends=d.trialEndsAt.toDate?d.trialEndsAt.toDate():new Date(d.trialEndsAt);
+      const days=Math.max(0,Math.ceil((ends-new Date())/(864e5)));
+      const td=document.getElementById('trial-days');
+      if(td)td.textContent=days;
+    }
+    }
+  }catch(e){console.error("Firestore error:",e);}
+});
+window._loggingOut=false;
+window.doLogout=async()=>{
+  if(confirm('Yakin mau logout?')){
+    window._loggingOut=true;
+    try{await signOut(auth);sessionStorage.clear();window.location.replace("login.html");}catch(e){window._loggingOut=false;}
+  } else {window._loggingOut=false;}
+};
+  }
+};
+</script>

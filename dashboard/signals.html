@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyora — Sinyal Live</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#020305;--dark:#080b0f;--panel:#0c1018;--border:#141b26;--border2:#1e2a3a;--green:#00ff88;--green2:#00cc6a;--red:#ff3366;--gold:#f0b429;--blue:#0ea5e9;--text:#c8d4e0;--text-dim:#5a6a7a;--text-bright:#eef2f7;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.015) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--text-bright);}
+.sidebar-logo span{color:var(--green);}
+.sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;color:var(--text-dim);font-size:0.82rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.1);}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+.user-avatar{width:32px;height:32px;border-radius:6px;background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;justify-content:center;}
+.user-name{font-size:0.78rem;font-weight:600;color:var(--text-bright);}
+.user-plan{font-size:0.6rem;color:var(--green);}
+.main{flex:1;margin-left:220px;position:relative;z-index:1;}
+.topbar{height:60px;background:rgba(2,3,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:9;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text-bright);}
+.topbar-status{display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--green);background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.15);padding:4px 12px;border-radius:100px;}
+.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.content{padding:28px;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.filter-btn{padding:8px 16px;border-radius:6px;font-size:0.75rem;font-weight:600;letter-spacing:1px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text-dim);transition:all 0.2s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--green);color:var(--green);background:rgba(0,255,136,0.06);}
+.filter-btn.buy-filter.active{border-color:var(--green);color:var(--green);background:rgba(0,255,136,0.08);}
+.filter-btn.sell-filter.active{border-color:var(--red);color:var(--red);background:rgba(255,51,102,0.08);}
+.filter-btn.hold-filter.active{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,0.08);}
+.filter-spacer{flex:1;}
+.refresh-info{font-size:0.7rem;color:var(--text-dim);display:flex;align-items:center;gap:6px;}
+.auto-refresh-btn{padding:7px 14px;border-radius:6px;font-size:0.72rem;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);color:var(--green);cursor:pointer;transition:all 0.2s;}
+.auto-refresh-btn:hover{background:rgba(0,255,136,0.15);}
+
+/* SIGNALS GRID */
+.signals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.signal-card{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:20px;transition:border-color 0.3s,transform 0.2s;cursor:pointer;position:relative;overflow:hidden;}
+.signal-card:hover{transform:translateY(-2px);}
+.signal-card.buy-card{border-color:rgba(0,255,136,0.2);}
+.signal-card.buy-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green);}
+.signal-card.sell-card{border-color:rgba(255,51,102,0.2);}
+.signal-card.sell-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red);}
+.signal-card.hold-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);}
+
+.sc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.sc-pair{font-family:'JetBrains Mono',monospace;font-size:0.9rem;font-weight:700;color:var(--text-bright);}
+.sc-signal{padding:3px 10px;border-radius:4px;font-size:0.62rem;font-weight:700;letter-spacing:1px;}
+.sig-buy{background:rgba(0,255,136,0.15);color:var(--green);}
+.sig-sell{background:rgba(255,51,102,0.15);color:var(--red);}
+.sig-hold{background:rgba(255,215,0,0.12);color:var(--gold);}
+
+.sc-price{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--text-bright);letter-spacing:2px;line-height:1;margin-bottom:2px;}
+.sc-change{font-size:0.72rem;font-family:'JetBrains Mono',monospace;margin-bottom:14px;}
+
+.sc-levels{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.sc-level{background:rgba(0,0,0,0.3);border-radius:4px;padding:7px;text-align:center;}
+.sc-level-label{font-size:0.55rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);}
+.sc-level-val{font-family:'JetBrains Mono',monospace;font-size:0.72rem;margin-top:3px;font-weight:700;}
+
+.sc-confidence{margin-top:4px;}
+.sc-conf-row{display:flex;justify-content:space-between;font-size:0.62rem;color:var(--text-dim);margin-bottom:4px;}
+.sc-conf-bar{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.sc-conf-fill{height:100%;border-radius:2px;}
+.fill-green{background:linear-gradient(90deg,var(--green2),var(--green));}
+.fill-gold{background:var(--gold);}
+.fill-red{background:var(--red);}
+
+.sc-indicators{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap;}
+.sc-ind{padding:2px 8px;border-radius:100px;font-size:0.58rem;font-family:'JetBrains Mono',monospace;}
+.ind-ok{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.15);}
+.ind-no{background:rgba(255,255,255,0.03);color:var(--text-dim);border:1px solid var(--border);}
+
+.sc-time{font-size:0.62rem;color:var(--text-dim);margin-top:10px;text-align:right;}
+
+/* LOADING */
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:60px;grid-column:1/-1;}
+.loading-spinner{width:32px;height:32px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:1200px){.signals-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.main{margin-left:0;}.signals-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo">VYORA<span>.</span>TRADE</div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a>
+    <a href="signals.html" class="nav-item active"><span>🎯</span> Sinyal Live</a>
+    <a href="bot.html" class="nav-item"><span>🤖</span> Auto Bot</a>
+    <a href="trades.html" class="nav-item"><span>📋</span> Riwayat Trade</a>
+    <a href="ai-chat.html" class="nav-item"><span>🧠</span> AI Advisor</a>
+    <a href="settings.html" class="nav-item"><span>⚙️</span> Settings</a>
+    <a href="billing.html" class="nav-item"><span>💳</span> Billing</a>
+    <a href="login.html" class="nav-item"><span>🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div><div class="user-name" id="sidebar-user-name">Loading...</div><div class="user-plan">✦ Trial — 6 hari</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">SINYAL LIVE</div>
+    <div class="topbar-status"><div class="dot"></div>Auto-refresh 15 menit</div>
+  </div>
+  <div class="content">
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterSignals('all',this)">Semua</button>
+      <button class="filter-btn buy-filter" onclick="filterSignals('BUY',this)">🟢 BUY</button>
+      <button class="filter-btn hold-filter" onclick="filterSignals('HOLD',this)">🟡 HOLD</button>
+      <button class="filter-btn sell-filter" onclick="filterSignals('SELL',this)">🔴 SELL</button>
+      <div class="filter-spacer"></div>
+      <div class="refresh-info" id="refresh-info">Update: —</div>
+      <button class="auto-refresh-btn" onclick="loadAllSignals()">↻ Refresh Sekarang</button>
+    </div>
+
+    <div class="signals-grid" id="signals-grid">
+      <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <span style="color:var(--text-dim);font-size:0.85rem">Mengambil data pasar...</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const PAIRS = [
+  {symbol:'BTCUSDT',name:'BTC/USDT'},
+  {symbol:'ETHUSDT',name:'ETH/USDT'},
+  {symbol:'BNBUSDT',name:'BNB/USDT'},
+  {symbol:'SOLUSDT',name:'SOL/USDT'},
+  {symbol:'XRPUSDT',name:'XRP/USDT'},
+  {symbol:'ADAUSDT',name:'ADA/USDT'},
+  {symbol:'DOGEUSDT',name:'DOGE/USDT'},
+  {symbol:'DOTUSDT',name:'DOT/USDT'},
+  {symbol:'AVAXUSDT',name:'AVAX/USDT'},
+];
+
+let allSignals = [];
+let currentFilter = 'all';
+
+function calcEMA(closes, period) {
+  if(closes.length < period) return closes[closes.length-1];
+  const k = 2/(period+1);
+  let ema = closes.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<closes.length;i++) ema = closes[i]*k+ema*(1-k);
+  return ema;
+}
+
+function calcRSI(closes, period=14) {
+  if(closes.length < period+1) return 50;
+  const gains=[],losses=[];
+  for(let i=1;i<closes.length;i++){const d=closes[i]-closes[i-1];gains.push(d>0?d:0);losses.push(d<0?-d:0);}
+  let ag=gains.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  let al=losses.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<gains.length;i++){ag=(ag*(period-1)+gains[i])/period;al=(al*(period-1)+losses[i])/period;}
+  if(al===0) return 100;
+  return 100-(100/(1+ag/al));
+}
+
+async function analyzeSymbol(pair) {
+  const r = await fetch(`https://api.binance.com/api/v3/klines?symbol=${pair.symbol}&interval=15m&limit=100`);
+  const data = await r.json();
+
+  const ticker = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${pair.symbol}`);
+  const tick = await ticker.json();
+
+  const closes = data.map(c => parseFloat(c[4]));
+  const vols = data.map(c => parseFloat(c[5]));
+
+  const price = parseFloat(tick.lastPrice);
+  const change = parseFloat(tick.priceChangePercent);
+  const rsi = calcRSI(closes);
+  const ema20 = calcEMA(closes, 20);
+  const ema50 = calcEMA(closes, 50);
+  const avgVol = vols.slice(-21,-1).reduce((a,b)=>a+b,0)/20;
+  const curVol = vols[vols.length-1];
+  const volRatio = curVol/avgVol;
+  const uptrend = ema20 > ema50;
+
+  let score = 0;
+  if(uptrend) score += 2;
+  if(rsi >= 35 && rsi <= 75) score += 2;
+  if(volRatio >= 0.8) score += 2;
+  score += 1;
+
+  const signal = score >= 5 && uptrend ? 'BUY' : 'HOLD';
+  const conf = score >= 5 ? 'HIGH' : score >= 3 ? 'MEDIUM' : 'LOW';
+  const confPct = Math.round(score/7*100);
+
+  return {
+    ...pair, price, change, rsi, ema20, ema50, volRatio,
+    signal, conf, confPct, score, uptrend,
+    tp: price * 1.03,
+    sl: price * 0.985,
+    entry: price,
+  };
+}
+
+async function loadAllSignals() {
+  document.getElementById('signals-grid').innerHTML = `
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <span style="color:var(--text-dim);font-size:0.85rem">Menganalisa ${PAIRS.length} pasang crypto...</span>
+    </div>`;
+
+  try {
+    allSignals = await Promise.all(PAIRS.map(analyzeSymbol));
+    renderSignals();
+    document.getElementById('refresh-info').textContent = 'Update: '+new Date().toLocaleTimeString('id');
+  } catch(e) {
+    document.getElementById('signals-grid').innerHTML = `<div class="loading-overlay" style="color:var(--red)">❌ Gagal ambil data. Cek koneksi internet.</div>`;
+  }
+}
+
+function renderSignals() {
+  const filtered = currentFilter === 'all' ? allSignals : allSignals.filter(s => s.signal === currentFilter);
+  const grid = document.getElementById('signals-grid');
+
+  if(!filtered.length) {
+    grid.innerHTML = `<div class="loading-overlay" style="color:var(--text-dim)">Tidak ada sinyal ${currentFilter} saat ini.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(s => {
+    const isUp = s.change >= 0;
+    const sigClass = s.signal==='BUY' ? 'buy-card' : s.signal==='SELL' ? 'sell-card' : 'hold-card';
+    const sigBadge = s.signal==='BUY' ? 'sig-buy' : s.signal==='SELL' ? 'sig-sell' : 'sig-hold';
+    const confColor = s.conf==='HIGH' ? 'fill-green' : s.conf==='MEDIUM' ? 'fill-gold' : 'fill-red';
+    const confTextColor = s.conf==='HIGH' ? 'var(--green)' : s.conf==='MEDIUM' ? 'var(--gold)' : 'var(--red)';
+
+    const priceStr = s.price.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:4});
+
+    return `
+    <div class="signal-card ${sigClass}">
+      <div class="sc-header">
+        <div class="sc-pair">${s.name}</div>
+        <div class="sc-signal ${sigBadge}">${s.signal}</div>
+      </div>
+      <div class="sc-price">$${parseFloat(s.price.toFixed(2)).toLocaleString('en')}</div>
+      <div class="sc-change ${isUp?'':''}">
+        <span style="color:${isUp?'var(--green)':'var(--red)'}">${isUp?'▲':'▼'} ${Math.abs(s.change).toFixed(2)}%</span>
+        <span style="color:var(--text-dim);margin-left:8px;font-size:0.65rem">24h</span>
+      </div>
+      <div class="sc-levels">
+        <div class="sc-level">
+          <div class="sc-level-label">Entry</div>
+          <div class="sc-level-val" style="color:var(--blue)">$${s.entry.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}</div>
+        </div>
+        <div class="sc-level">
+          <div class="sc-level-label">TP +3%</div>
+          <div class="sc-level-val" style="color:var(--green)">$${s.tp.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}</div>
+        </div>
+        <div class="sc-level">
+          <div class="sc-level-label">SL -1.5%</div>
+          <div class="sc-level-val" style="color:var(--red)">$${s.sl.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}</div>
+        </div>
+      </div>
+      <div class="sc-confidence">
+        <div class="sc-conf-row">
+          <span>${s.conf} · Score ${s.score}/7</span>
+          <span style="color:${confTextColor};font-weight:700">${s.confPct}%</span>
+        </div>
+        <div class="sc-conf-bar"><div class="sc-conf-fill ${confColor}" style="width:${s.confPct}%"></div></div>
+      </div>
+      <div class="sc-indicators">
+        <span class="sc-ind ${s.uptrend?'ind-ok':'ind-no'}">EMA ${s.uptrend?'✓':'✗'}</span>
+        <span class="sc-ind ${s.rsi>=35&&s.rsi<=75?'ind-ok':'ind-no'}">RSI ${s.rsi.toFixed(0)}</span>
+        <span class="sc-ind ${s.volRatio>=0.8?'ind-ok':'ind-no'}">VOL ${s.volRatio.toFixed(1)}x</span>
+      </div>
+      <div class="sc-time">Dianalisa ${new Date().toLocaleTimeString('id')}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterSignals(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if(allSignals.length) renderSignals();
+}
+
+// Init
+loadAllSignals();
+setInterval(loadAllSignals, 15 * 60 * 1000);
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
+</script>
+<footer style="text-align:center;padding:20px;font-size:0.65rem;color:#3a4a5a;letter-spacing:2px;text-transform:uppercase;border-top:1px solid #141b26;margin-top:40px">Vyora by J-CUBE | All Digital In One Cube · Bali, Indonesia · 2026</footer>
+</body>
+</html>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){window.location.href='login.html';return;}
+  const snap=await getDoc(doc(db,'users',u.uid));
+  if(snap.exists()){
+    const d=snap.data();
+    const nm=document.getElementById('sidebar-user-name');
+    const pl=document.getElementById('sidebar-user-plan');
+    if(nm)nm.textContent=d.name||u.email;
+    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+  }
+});
+window.doLogout=async()=>{
+  if(confirm('Yakin mau logout?')){
+    await signOut(auth);
+    window.location.href='login.html';
+  }
+};
+</script>

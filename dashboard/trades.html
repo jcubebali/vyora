@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyora — Riwayat Trade</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#020305;--dark:#080b0f;--panel:#0c1018;--border:#141b26;--border2:#1e2a3a;--green:#00ff88;--green2:#00cc6a;--red:#ff3366;--gold:#f0b429;--blue:#0ea5e9;--text:#c8d4e0;--text-dim:#5a6a7a;--text-bright:#eef2f7;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.015) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--text-bright);}
+.sidebar-logo span{color:var(--green);}
+.sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;color:var(--text-dim);font-size:0.82rem;font-weight:500;text-decoration:none;transition:all 0.2s;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.1);}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+.user-avatar{width:32px;height:32px;border-radius:6px;background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;justify-content:center;}
+.user-name{font-size:0.78rem;font-weight:600;color:var(--text-bright);}
+.user-plan{font-size:0.6rem;color:var(--green);}
+.main{flex:1;margin-left:220px;position:relative;z-index:1;}
+.topbar{height:60px;background:rgba(2,3,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:9;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text-bright);}
+.topbar-btn{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);color:var(--green);padding:7px 16px;border-radius:4px;font-size:0.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.content{padding:28px;}
+
+/* SUMMARY CARDS */
+.summary-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+.sum-card{background:var(--panel);border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;}
+.sum-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px;}
+.sum-value{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;}
+
+/* FILTER */
+.filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.filter-btn{padding:7px 14px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text-dim);transition:all 0.2s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--green);color:var(--green);background:rgba(0,255,136,0.06);}
+.filter-spacer{flex:1;}
+.export-btn{padding:7px 14px;border-radius:6px;font-size:0.72rem;background:rgba(255,255,255,0.04);border:1px solid var(--border2);color:var(--text-dim);cursor:pointer;transition:all 0.2s;}
+.export-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* TABLE */
+.trades-table{background:var(--panel);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.table-header{display:grid;grid-template-columns:120px 100px 120px 120px 120px 100px 120px 80px;padding:12px 20px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border);font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);}
+.table-row{display:grid;grid-template-columns:120px 100px 120px 120px 120px 100px 120px 80px;padding:14px 20px;border-bottom:1px solid var(--border);font-size:0.8rem;align-items:center;transition:background 0.2s;cursor:pointer;}
+.table-row:hover{background:rgba(255,255,255,0.02);}
+.table-row:last-child{border-bottom:none;}
+.badge{padding:3px 10px;border-radius:3px;font-size:0.6rem;font-weight:700;letter-spacing:1px;display:inline-block;}
+.badge-buy{background:rgba(0,255,136,0.12);color:var(--green);}
+.badge-tp{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+.badge-sl{background:rgba(255,51,102,0.12);color:var(--red);}
+.td-price{font-family:'JetBrains Mono',monospace;font-size:0.78rem;}
+.td-pnl{font-family:'JetBrains Mono',monospace;font-size:0.82rem;font-weight:700;}
+.td-time{font-size:0.7rem;color:var(--text-dim);}
+.td-pair{font-family:'JetBrains Mono',monospace;font-size:0.82rem;font-weight:700;color:var(--text-bright);}
+
+/* PAGINATION */
+.pagination{display:flex;justify-content:center;gap:8px;padding:20px;}
+.page-btn{width:32px;height:32px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text-dim);cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.page-btn:hover,.page-btn.active{border-color:var(--green);color:var(--green);}
+
+/* CHART MINI */
+.pnl-chart{height:80px;background:var(--panel);border:1px solid var(--border2);border-radius:8px;display:flex;align-items:flex-end;gap:2px;padding:10px;margin-bottom:20px;overflow:hidden;}
+.pnl-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;}
+.bar-pos{background:var(--green);opacity:0.7;}
+.bar-neg{background:var(--red);opacity:0.7;}
+
+@media(max-width:1200px){.table-header,.table-row{grid-template-columns:100px 90px 110px 110px 100px 90px 100px 70px;font-size:0.72rem;}}
+@media(max-width:768px){.main{margin-left:0;}.summary-row{grid-template-columns:repeat(3,1fr);}.table-header,.table-row{grid-template-columns:80px 80px 1fr 80px;}.table-header :not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(5)):not(:nth-child(8)){display:none;}.table-row :not(:nth-child(1)):not(:nth-child(2)):not(:nth-child(5)):not(:nth-child(8)){display:none;}}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo">VYORA<span>.</span>TRADE</div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a>
+    <a href="signals.html" class="nav-item"><span>🎯</span> Sinyal Live</a>
+    <a href="bot.html" class="nav-item"><span>🤖</span> Auto Bot</a>
+    <a href="trades.html" class="nav-item active"><span>📋</span> Riwayat Trade</a>
+    <a href="ai-chat.html" class="nav-item"><span>🧠</span> AI Advisor</a>
+    <a href="portfolio.html" class="nav-item"><span>💼</span> Portfolio</a>
+    <a href="settings.html" class="nav-item"><span>⚙️</span> Settings</a>
+    <a href="billing.html" class="nav-item"><span>💳</span> Billing</a>
+    <a href="login.html" class="nav-item"><span>🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div><div class="user-name" id="sidebar-user-name">Loading...</div><div class="user-plan">✦ Trial — 6 hari</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">RIWAYAT TRADE</div>
+    <button class="topbar-btn" onclick="exportCSV()">📥 Export CSV</button>
+  </div>
+  <div class="content">
+
+    <!-- SUMMARY -->
+    <div class="summary-row">
+      <div class="sum-card">
+        <div class="sum-label">Total Trade</div>
+        <div class="sum-value" style="color:var(--text-bright)">4</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Win</div>
+        <div class="sum-value" style="color:var(--green)">2</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Loss</div>
+        <div class="sum-value" style="color:var(--red)">0</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Win Rate</div>
+        <div class="sum-value" style="color:var(--gold)">100%</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">Total PnL</div>
+        <div class="sum-value" style="color:var(--green)">+$0.16</div>
+      </div>
+    </div>
+
+    <!-- PNL CHART -->
+    <div class="pnl-chart" id="pnl-chart"></div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterTrades('all',this)">Semua</button>
+      <button class="filter-btn" onclick="filterTrades('BUY',this)">BUY</button>
+      <button class="filter-btn" onclick="filterTrades('SELL_TP',this)">TP Hit</button>
+      <button class="filter-btn" onclick="filterTrades('SELL_SL',this)">SL Hit</button>
+      <div class="filter-spacer"></div>
+      <button class="export-btn" onclick="exportCSV()">📥 CSV</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="trades-table">
+      <div class="table-header">
+        <div>Waktu</div>
+        <div>Aksi</div>
+        <div>Pair</div>
+        <div>Harga Entry</div>
+        <div>Harga Exit</div>
+        <div>Qty (BTC)</div>
+        <div>PnL</div>
+        <div>Status</div>
+      </div>
+      <div id="trades-body"></div>
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const trades = [
+  {time:'2026-04-27 03:23',action:'SELL_TP',pair:'BTC/USDT',entry:77619.99,exit:78316.45,qty:0.00007,pnl:0.0487,status:'WIN'},
+  {time:'2026-04-26 07:44',action:'BUY',pair:'BTC/USDT',entry:77619.99,exit:null,qty:0.00007,pnl:null,status:'CLOSED'},
+  {time:'2026-04-21 20:26',action:'SELL_TP',pair:'BTC/USDT',entry:74578.30,exit:76359.23,qty:0.00012,pnl:0.1128,status:'WIN'},
+  {time:'2026-04-14 21:35',action:'BUY',pair:'BTC/USDT',entry:74578.30,exit:null,qty:0.00012,pnl:null,status:'CLOSED'},
+];
+
+let filtered = [...trades];
+
+function filterTrades(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtered = type === 'all' ? [...trades] : trades.filter(t => t.action === type);
+  renderTrades();
+}
+
+function renderTrades() {
+  const body = document.getElementById('trades-body');
+  if(!filtered.length) {
+    body.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-dim);font-size:0.82rem">Tidak ada data trade</div>';
+    return;
+  }
+  body.innerHTML = filtered.map(t => {
+    const badgeClass = t.action==='BUY' ? 'badge-buy' : t.action==='SELL_TP' ? 'badge-tp' : 'badge-sl';
+    const badgeText = t.action==='BUY' ? 'BUY' : t.action==='SELL_TP' ? 'SELL TP' : 'SELL SL';
+    const pnlText = t.pnl ? `<span style="color:${t.pnl>0?'var(--green)':'var(--red)'}">${t.pnl>0?'+':''}$${t.pnl.toFixed(4)}</span>` : '<span style="color:var(--text-dim)">—</span>';
+    const statusColor = t.status==='WIN' ? 'var(--green)' : t.status==='LOSS' ? 'var(--red)' : 'var(--text-dim)';
+    return `
+    <div class="table-row">
+      <div class="td-time">${t.time}</div>
+      <div><span class="badge ${badgeClass}">${badgeText}</span></div>
+      <div class="td-pair">${t.pair}</div>
+      <div class="td-price">$${t.entry.toLocaleString('en',{minimumFractionDigits:2})}</div>
+      <div class="td-price">${t.exit ? '$'+t.exit.toLocaleString('en',{minimumFractionDigits:2}) : '—'}</div>
+      <div class="td-price">${t.qty}</div>
+      <div class="td-pnl">${pnlText}</div>
+      <div style="font-size:0.7rem;color:${statusColor};font-weight:700">${t.status}</div>
+    </div>`;
+  }).join('');
+}
+
+function exportCSV() {
+  const rows = [['Waktu','Aksi','Pair','Entry','Exit','Qty','PnL','Status']];
+  trades.forEach(t => rows.push([t.time,t.action,t.pair,t.entry,t.exit||'',t.qty,t.pnl||'',t.status]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download = 'nexus_trade_history.csv';
+  a.click();
+}
+
+// PnL Chart
+function renderChart() {
+  const data = [0,0,0,0,0,0,0.1128,0,0,0,0,0,0.0487,0];
+  const max = Math.max(...data);
+  const chart = document.getElementById('pnl-chart');
+  chart.innerHTML = data.map(v => `<div class="pnl-bar ${v>=0?'bar-pos':'bar-neg'}" style="height:${v===0?8:Math.max((v/max)*100,8)}%"></div>`).join('');
+}
+
+renderTrades();
+renderChart();
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
+</script>
+<footer style="text-align:center;padding:20px;font-size:0.65rem;color:#3a4a5a;letter-spacing:2px;text-transform:uppercase;border-top:1px solid #141b26;margin-top:40px">Vyora by J-CUBE | All Digital In One Cube · Bali, Indonesia · 2026</footer>
+</body>
+</html>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){window.location.href='login.html';return;}
+  const snap=await getDoc(doc(db,'users',u.uid));
+  if(snap.exists()){
+    const d=snap.data();
+    const nm=document.getElementById('sidebar-user-name');
+    const pl=document.getElementById('sidebar-user-plan');
+    if(nm)nm.textContent=d.name||u.email;
+    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+  }
+});
+window.doLogout=async()=>{
+  if(confirm('Yakin mau logout?')){
+    await signOut(auth);
+    window.location.href='login.html';
+  }
+};
+</script>

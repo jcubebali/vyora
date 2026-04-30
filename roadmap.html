@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS TRADE — SaaS Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#020305;--panel:#0c1018;--border:#141b26;--border2:#1e2a3a;
+  --green:#00ff88;--green2:#00cc6a;--red:#ff3366;--gold:#f0b429;
+  --blue:#0ea5e9;--purple:#8b5cf6;--orange:#f97316;
+  --text:#c8d4e0;--text-dim:#5a6a7a;--text-bright:#eef2f7;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;padding:40px 20px;max-width:1100px;margin:0 auto;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.02) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;}
+.header{text-align:center;margin-bottom:60px;}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);padding:6px 20px;border-radius:100px;font-size:0.7rem;color:var(--green);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,5.5rem);color:var(--text-bright);letter-spacing:3px;line-height:1;margin-bottom:16px;}
+h1 span{color:var(--green);}
+.subtitle{font-size:1rem;color:var(--text-dim);font-weight:300;max-width:500px;margin:0 auto;line-height:1.7;}
+.revenue-banner{background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,255,136,0.02));border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:32px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:60px;position:relative;overflow:hidden;}
+.revenue-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.rev-item{text-align:center;}
+.rev-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--green);letter-spacing:2px;}
+.rev-label{font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin-top:4px;}
+.section{margin-bottom:50px;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--text-bright);letter-spacing:2px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border2);}
+.phases{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:50px;}
+.phase-card{background:var(--panel);border:1px solid var(--border2);border-radius:12px;padding:28px;position:relative;overflow:hidden;}
+.phase-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.phase-1::before{background:var(--green);}
+.phase-2::before{background:var(--blue);}
+.phase-3::before{background:var(--purple);}
+.phase-4::before{background:var(--gold);}
+.phase-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;}
+.phase-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:1;opacity:0.15;letter-spacing:2px;}
+.phase-1 .phase-num{color:var(--green);}
+.phase-2 .phase-num{color:var(--blue);}
+.phase-3 .phase-num{color:var(--purple);}
+.phase-4 .phase-num{color:var(--gold);}
+.phase-badge{padding:4px 12px;border-radius:4px;font-size:0.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.badge-now{background:rgba(0,255,136,0.15);color:var(--green);}
+.badge-soon{background:rgba(14,165,233,0.15);color:var(--blue);}
+.badge-next{background:rgba(139,92,246,0.15);color:var(--purple);}
+.badge-later{background:rgba(240,180,41,0.15);color:var(--gold);}
+.phase-title{font-size:1.1rem;font-weight:700;color:var(--text-bright);margin-bottom:6px;}
+.phase-duration{font-size:0.72rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-bottom:16px;}
+.phase-tasks{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.phase-tasks li{display:flex;align-items:flex-start;gap:10px;font-size:0.82rem;color:var(--text);line-height:1.5;}
+.task-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+.phase-1 .task-dot{background:var(--green);}
+.phase-2 .task-dot{background:var(--blue);}
+.phase-3 .task-dot{background:var(--purple);}
+.phase-4 .task-dot{background:var(--gold);}
+.phase-cost{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.cost-label{font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
+.cost-value{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text-bright);font-weight:700;}
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:50px;}
+.tech-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.tech-category{font-size:0.6rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;}
+.tech-list{display:flex;flex-direction:column;gap:8px;}
+.tech-item{display:flex;align-items:center;gap:10px;font-size:0.82rem;}
+.tech-icon{font-size:1rem;}
+.tech-name{color:var(--text-bright);font-weight:500;}
+.tech-desc{font-size:0.7rem;color:var(--text-dim);margin-top:1px;}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px;}
+.pricing-card{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:24px 20px;text-align:center;}
+.pricing-card.featured{border-color:var(--green);background:linear-gradient(135deg,rgba(0,255,136,0.05),var(--panel));}
+.plan-tag{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px;}
+.plan-price{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--text-bright);letter-spacing:2px;}
+.plan-period{font-size:0.7rem;color:var(--text-dim);}
+.plan-features{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:6px;text-align:left;}
+.plan-features li{font-size:0.75rem;color:var(--text-dim);display:flex;gap:6px;}
+.plan-features li::before{content:'·';color:var(--green);}
+.plan-revenue{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:0.7rem;color:var(--text-dim);}
+.plan-revenue strong{color:var(--green);font-family:'JetBrains Mono';}
+.revenue-table{background:var(--panel);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:50px;}
+.rev-table-header{display:grid;grid-template-columns:80px 60px 60px 60px 80px 100px 1fr;padding:14px 20px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border);font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
+.rev-table-row{display:grid;grid-template-columns:80px 60px 60px 60px 80px 100px 1fr;padding:14px 20px;border-bottom:1px solid var(--border);font-size:0.8rem;align-items:center;}
+.rev-table-row:last-child{border-bottom:none;background:rgba(0,255,136,0.03);}
+.month-label{font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--text-dim);}
+.rev-amount{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--green);font-weight:700;}
+.rev-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.rev-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--green2),var(--green));}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:50px;}
+.kpi-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.kpi-label{font-size:0.65rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+.kpi-value{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:2px;}
+.kpi-target{font-size:0.7rem;color:var(--text-dim);margin-top:4px;}
+.checklist{background:var(--panel);border:1px solid var(--border2);border-radius:12px;padding:28px;margin-bottom:50px;}
+.checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.check-item{display:flex;align-items:center;gap:10px;font-size:0.82rem;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:6px;}
+.footer-note{text-align:center;padding:32px;border:1px solid var(--border);border-radius:12px;background:rgba(0,255,136,0.03);}
+.footer-note h3{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--text-bright);letter-spacing:2px;margin-bottom:8px;}
+.footer-note p{font-size:0.85rem;color:var(--text-dim);max-width:500px;margin:0 auto;line-height:1.7;font-weight:300;}
+@media(max-width:768px){
+  .phases,.tech-grid{grid-template-columns:1fr;}
+  .pricing-grid,.kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .revenue-banner{grid-template-columns:repeat(2,1fr);}
+  .checklist-grid{grid-template-columns:1fr;}
+  .rev-table-header,.rev-table-row{grid-template-columns:70px 1fr 1fr 80px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="badge">🚀 SaaS Business Roadmap 2026</div>
+  <h1>NEXUS<span>.</span>TRADE<br>MASTER PLAN</h1>
+  <p class="subtitle">Dari trading bot pribadi menjadi SaaS bisnis yang menghasilkan pendapatan pasif bulanan yang konsisten.</p>
+</div>
+
+<div class="revenue-banner">
+  <div class="rev-item"><div class="rev-num">Rp5jt</div><div class="rev-label">Target Bulan 3</div></div>
+  <div class="rev-item"><div class="rev-num">Rp20jt</div><div class="rev-label">Target Bulan 6</div></div>
+  <div class="rev-item"><div class="rev-num">Rp50jt</div><div class="rev-label">Target Bulan 12</div></div>
+  <div class="rev-item"><div class="rev-num">500+</div><div class="rev-label">Target Subscriber</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">📋 FASE PENGEMBANGAN</div>
+  <div class="phases">
+    <div class="phase-card phase-1">
+      <div class="phase-header">
+        <div class="phase-num">01</div>
+        <div class="phase-badge badge-now">Sekarang</div>
+      </div>
+      <div class="phase-title">Foundation & MVP</div>
+      <div class="phase-duration">⏱ Minggu 1–3</div>
+      <ul class="phase-tasks">
+        <li><span class="task-dot"></span>Deploy landing page NEXUS TRADE</li>
+        <li><span class="task-dot"></span>Setup domain & VPS hosting</li>
+        <li><span class="task-dot"></span>Finalisasi auto_bot_v4.py ✅</li>
+        <li><span class="task-dot"></span>Build dashboard user (Next.js)</li>
+        <li><span class="task-dot"></span>Auth system (login/register)</li>
+        <li><span class="task-dot"></span>Input & enkripsi API key Binance</li>
+        <li><span class="task-dot"></span>Halaman pantau sinyal live</li>
+      </ul>
+      <div class="phase-cost">
+        <div><div class="cost-label">Biaya</div><div class="cost-value">Rp200rb–500rb/bln</div></div>
+        <div><div class="cost-label">Target</div><div class="cost-value" style="color:var(--green)">10 Beta User</div></div>
+      </div>
+    </div>
+    <div class="phase-card phase-2">
+      <div class="phase-header">
+        <div class="phase-num">02</div>
+        <div class="phase-badge badge-soon">Bulan 1–2</div>
+      </div>
+      <div class="phase-title">Payment & Subscription</div>
+      <div class="phase-duration">⏱ Minggu 4–6</div>
+      <ul class="phase-tasks">
+        <li><span class="task-dot"></span>Integrasi Midtrans payment</li>
+        <li><span class="task-dot"></span>Sistem paket Free/Pro/Elite</li>
+        <li><span class="task-dot"></span>Auto renewal subscription</li>
+        <li><span class="task-dot"></span>Invoice & email notifikasi</li>
+        <li><span class="task-dot"></span>Bot manager (per user)</li>
+        <li><span class="task-dot"></span>Notifikasi Telegram otomatis</li>
+        <li><span class="task-dot"></span>Dashboard profit/loss user</li>
+      </ul>
+      <div class="phase-cost">
+        <div><div class="cost-label">Biaya</div><div class="cost-value">Rp500rb–1jt/bln</div></div>
+        <div><div class="cost-label">Revenue</div><div class="cost-value" style="color:var(--blue)">Rp5jt/bln</div></div>
+      </div>
+    </div>
+    <div class="phase-card phase-3">
+      <div class="phase-header">
+        <div class="phase-num">03</div>
+        <div class="phase-badge badge-next">Bulan 3–6</div>
+      </div>
+      <div class="phase-title">Scale & Advanced Features</div>
+      <div class="phase-duration">⏱ Bulan 3–6</div>
+      <ul class="phase-tasks">
+        <li><span class="task-dot"></span>AI Chat Advisor (Claude API)</li>
+        <li><span class="task-dot"></span>Multi-pair (ETH, BNB, SOL)</li>
+        <li><span class="task-dot"></span>Backtesting tool untuk user</li>
+        <li><span class="task-dot"></span>Custom strategi per user</li>
+        <li><span class="task-dot"></span>Affiliate & referral system</li>
+        <li><span class="task-dot"></span>Mobile app (React Native)</li>
+        <li><span class="task-dot"></span>WhatsApp notifikasi</li>
+      </ul>
+      <div class="phase-cost">
+        <div><div class="cost-label">Biaya</div><div class="cost-value">Rp2jt–5jt/bln</div></div>
+        <div><div class="cost-label">Revenue</div><div class="cost-value" style="color:var(--purple)">Rp20jt/bln</div></div>
+      </div>
+    </div>
+    <div class="phase-card phase-4">
+      <div class="phase-header">
+        <div class="phase-num">04</div>
+        <div class="phase-badge badge-later">Bulan 6–12</div>
+      </div>
+      <div class="phase-title">Expansion & Enterprise</div>
+      <div class="phase-duration">⏱ Bulan 6–12</div>
+      <ul class="phase-tasks">
+        <li><span class="task-dot"></span>Support Bybit, OKX, KuCoin</li>
+        <li><span class="task-dot"></span>Enterprise white label plan</li>
+        <li><span class="task-dot"></span>Copy trading fitur</li>
+        <li><span class="task-dot"></span>Marketplace strategi</li>
+        <li><span class="task-dot"></span>Token/loyalty program</li>
+        <li><span class="task-dot"></span>Partnership komunitas crypto</li>
+        <li><span class="task-dot"></span>Series A funding (opsional)</li>
+      </ul>
+      <div class="phase-cost">
+        <div><div class="cost-label">Biaya</div><div class="cost-value">Rp10jt–20jt/bln</div></div>
+        <div><div class="cost-label">Revenue</div><div class="cost-value" style="color:var(--gold)">Rp50jt+/bln</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">⚙️ TECH STACK</div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-category">Frontend</div>
+      <div class="tech-list">
+        <div class="tech-item"><div class="tech-icon">⚛️</div><div><div class="tech-name">Next.js 14 + TypeScript</div><div class="tech-desc">Landing page + Dashboard user</div></div></div>
+        <div class="tech-item"><div class="tech-icon">🎨</div><div><div class="tech-name">Tailwind CSS</div><div class="tech-desc">Styling + responsive design</div></div></div>
+        <div class="tech-item"><div class="tech-icon">📊</div><div><div class="tech-name">Recharts / TradingView</div><div class="tech-desc">Chart trading real-time</div></div></div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category">Backend</div>
+      <div class="tech-list">
+        <div class="tech-item"><div class="tech-icon">🐍</div><div><div class="tech-name">Python FastAPI</div><div class="tech-desc">REST API + Bot manager</div></div></div>
+        <div class="tech-item"><div class="tech-icon">🔐</div><div><div class="tech-name">JWT + OAuth2</div><div class="tech-desc">Authentication & authorization</div></div></div>
+        <div class="tech-item"><div class="tech-icon">⚡</div><div><div class="tech-name">Redis + Celery</div><div class="tech-desc">Task queue & caching</div></div></div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-category">Database & Infra</div>
+      <div class="tech-list">
+        <div class="tech-item"><div class="tech-icon">🐘</div><div><div class="tech-name">PostgreSQL</div><div class="tech-desc">User data & trade history</div></div></div>
+        <div class="tech-item"><div class="tech-icon">🖥️</div><div><div class="tech-name">VPS Singapore</div><div class="tech-desc">Contabo / DigitalOcean</div></div></div>
+        <div class="tech-item"><div class="tech-icon">💳</div><div><div class="tech-name">Midtrans</div><div class="tech-desc">Payment gateway Indonesia</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">💰 MODEL BISNIS & PRICING</div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-tag">Free Trial</div>
+      <div class="plan-price">Rp0</div>
+      <div class="plan-period">7 hari</div>
+      <ul class="plan-features">
+        <li>5 sinyal/hari</li><li>BTC only</li><li>Dashboard basic</li><li>No auto bot</li>
+      </ul>
+      <div class="plan-revenue">100 user trial<br><strong>→ Akuisisi</strong></div>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-tag">Basic</div>
+      <div class="plan-price">Rp99k</div>
+      <div class="plan-period">/bulan</div>
+      <ul class="plan-features">
+        <li>Sinyal unlimited</li><li>5 crypto pairs</li><li>Telegram notif</li><li>No auto bot</li>
+      </ul>
+      <div class="plan-revenue">50 sub<br><strong>→ Rp4.95jt/bln</strong></div>
+    </div>
+    <div class="pricing-card featured">
+      <div class="plan-tag">Pro ⭐</div>
+      <div class="plan-price">Rp199k</div>
+      <div class="plan-period">/bulan</div>
+      <ul class="plan-features">
+        <li>Auto trading bot</li><li>20 crypto pairs</li><li>AI Chat advisor</li><li>Risk management</li>
+      </ul>
+      <div class="plan-revenue">100 sub<br><strong>→ Rp19.9jt/bln</strong></div>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-tag">Elite</div>
+      <div class="plan-price">Rp499k</div>
+      <div class="plan-period">/bulan</div>
+      <ul class="plan-features">
+        <li>Semua fitur Pro</li><li>50+ pairs</li><li>Multi exchange</li><li>Priority support</li>
+      </ul>
+      <div class="plan-revenue">30 sub<br><strong>→ Rp14.97jt/bln</strong></div>
+    </div>
+  </div>
+  <div style="text-align:center;font-size:0.82rem;color:var(--text-dim);padding:16px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.1);border-radius:8px;">
+    🎯 Target 180 paid subscriber = <span style="color:var(--green);font-family:'JetBrains Mono';font-weight:700;">Rp39.82jt/bulan</span> · Biaya ops ~Rp5jt · <span style="color:var(--green)">Profit bersih ~Rp34jt/bln</span>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">📈 PROYEKSI REVENUE 12 BULAN</div>
+  <div class="revenue-table">
+    <div class="rev-table-header">
+      <div>Bulan</div><div>Basic</div><div>Pro</div><div>Elite</div><div>Total</div><div>Revenue</div><div>Growth</div>
+    </div>
+    <div class="rev-table-row"><div class="month-label">Bln 1</div><div>5</div><div>3</div><div>1</div><div>9</div><div class="rev-amount">Rp1.1jt</div><div><div class="rev-bar"><div class="rev-fill" style="width:2%"></div></div></div></div>
+    <div class="rev-table-row"><div class="month-label">Bln 2</div><div>15</div><div>10</div><div>3</div><div>28</div><div class="rev-amount">Rp4.0jt</div><div><div class="rev-bar"><div class="rev-fill" style="width:8%"></div></div></div></div>
+    <div class="rev-table-row"><div class="month-label">Bln 3</div><div>25</div><div>20</div><div>5</div><div>50</div><div class="rev-amount">Rp9.4jt</div><div><div class="rev-bar"><div class="rev-fill" style="width:18%"></div></div></div></div>
+    <div class="rev-table-row"><div class="month-label">Bln 6</div><div>50</div><div>60</div><div>15</div><div>125</div><div class="rev-amount">Rp24.9jt</div><div><div class="rev-bar"><div class="rev-fill" style="width:48%"></div></div></div></div>
+    <div class="rev-table-row"><div class="month-label">Bln 9</div><div>80</div><div>100</div><div>25</div><div>205</div><div class="rev-amount">Rp39.7jt</div><div><div class="rev-bar"><div class="rev-fill" style="width:78%"></div></div></div></div>
+    <div class="rev-table-row"><div class="month-label" style="color:var(--green)">Bln 12</div><div>100</div><div>150</div><div>40</div><div style="color:var(--green);font-weight:700">290</div><div class="rev-amount" style="font-size:1rem">Rp59.6jt</div><div><div class="rev-bar"><div class="rev-fill" style="width:100%"></div></div></div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">🎯 KEY METRICS</div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Churn Rate</div><div class="kpi-value" style="color:var(--green)">&lt;5%</div><div class="kpi-target">Target per bulan</div></div>
+    <div class="kpi-card"><div class="kpi-label">Trial Conversion</div><div class="kpi-value" style="color:var(--blue)">30%</div><div class="kpi-target">Free → Paid</div></div>
+    <div class="kpi-card"><div class="kpi-label">Bot Win Rate</div><div class="kpi-value" style="color:var(--purple)">55%+</div><div class="kpi-target">Minimum acceptable</div></div>
+    <div class="kpi-card"><div class="kpi-label">LTV : CAC</div><div class="kpi-value" style="color:var(--gold)">3:1</div><div class="kpi-target">Lifetime value ratio</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">✅ STATUS DEVELOPMENT</div>
+  <div class="checklist">
+    <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:4px">Progress MVP — Yang sudah selesai vs yang masih perlu dibangun</div>
+    <div class="checklist-grid">
+      <div class="check-item"><span style="color:var(--green)">✅</span><span>Trading bot Python (auto_bot_v4.py)</span></div>
+      <div class="check-item"><span style="color:var(--green)">✅</span><span>Koneksi Binance API</span></div>
+      <div class="check-item"><span style="color:var(--green)">✅</span><span>Strategy EMA + RSI + Volume</span></div>
+      <div class="check-item"><span style="color:var(--green)">✅</span><span>Auto entry + OCO (TP/SL)</span></div>
+      <div class="check-item"><span style="color:var(--green)">✅</span><span>Landing page NEXUS TRADE</span></div>
+      <div class="check-item"><span style="color:var(--green)">✅</span><span>Trade journal & logging</span></div>
+      <div class="check-item"><span style="color:var(--text-dim)">⬜</span><span style="color:var(--text-dim)">Dashboard user (Next.js)</span></div>
+      <div class="check-item"><span style="color:var(--text-dim)">⬜</span><span style="color:var(--text-dim)">Auth system (login/register)</span></div>
+      <div class="check-item"><span style="color:var(--text-dim)">⬜</span><span style="color:var(--text-dim)">Backend API (FastAPI)</span></div>
+      <div class="check-item"><span style="color:var(--text-dim)">⬜</span><span style="color:var(--text-dim)">Payment Midtrans</span></div>
+      <div class="check-item"><span style="color:var(--text-dim)">⬜</span><span style="color:var(--text-dim)">Bot manager multi user</span></div>
+      <div class="check-item"><span style="color:var(--text-dim)">⬜</span><span style="color:var(--text-dim)">Deploy ke VPS Singapore</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  <h3>NEXT STEP: DASHBOARD USER</h3>
+  <p>Bot sudah bekerja dengan baik. Langkah selanjutnya adalah membangun <strong style="color:var(--green)">dashboard user dengan Next.js</strong> — tempat user login, input API key Binance mereka, dan pantau bot berjalan. Ini komponen paling kritis untuk launch MVP dan mulai onboard subscriber pertama.</p>
+  <br>
+  <p style="font-size:0.75rem;color:var(--text-dim)">Nexus Trade by J-CUBE Digital · Bali, Indonesia · 2026</p>
+</div>
+
+</div>
+</body>
+</html>

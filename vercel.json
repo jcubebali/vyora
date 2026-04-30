@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "routes": [
+    {"src": "/", "dest": "/index.html"},
+    {"src": "/dashboard", "dest": "/dashboard/dashboard.html"},
+    {"src": "/login", "dest": "/dashboard/login.html"},
+    {"src": "/signals", "dest": "/dashboard/signals.html"},
+    {"src": "/bot", "dest": "/dashboard/bot.html"},
+    {"src": "/trades", "dest": "/dashboard/trades.html"},
+    {"src": "/ai-chat", "dest": "/dashboard/ai-chat.html"},
+    {"src": "/portfolio", "dest": "/dashboard/portfolio.html"},
+    {"src": "/settings", "dest": "/dashboard/settings.html"},
+    {"src": "/billing", "dest": "/dashboard/billing.html"}
+  ]
+}

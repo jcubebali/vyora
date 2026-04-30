@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyora — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#020305;--dark:#080b0f;--panel:#0c1018;--border:#141b26;--border2:#1e2a3a;--green:#00ff88;--green2:#00cc6a;--red:#ff3366;--gold:#f0b429;--blue:#0ea5e9;--text:#c8d4e0;--text-dim:#5a6a7a;--text-bright:#eef2f7;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.015) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.sidebar{width:220px;background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:10;}
+.sidebar-logo{padding:24px 20px;border-bottom:1px solid var(--border);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;color:var(--text-bright);}
+.sidebar-logo span{color:var(--green);}
+.sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:4px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;color:var(--text-dim);font-size:0.82rem;font-weight:500;text-decoration:none;}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text);}
+.nav-item.active{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.1);}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+.user-avatar{width:32px;height:32px;border-radius:6px;background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.2);display:flex;align-items:center;justify-content:center;font-size:0.9rem;}
+.user-name{font-size:0.78rem;font-weight:600;color:var(--text-bright);}
+.user-plan{font-size:0.6rem;color:var(--green);}
+.main{flex:1;margin-left:220px;position:relative;z-index:1;}
+.topbar{height:60px;background:rgba(2,3,5,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:9;}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--text-bright);}
+.content{padding:28px;max-width:800px;}
+.settings-section{margin-bottom:32px;}
+.section-title{font-size:0.7rem;text-transform:uppercase;letter-spacing:3px;color:var(--text-dim);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.settings-card{background:var(--panel);border:1px solid var(--border2);border-radius:10px;padding:24px;margin-bottom:16px;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+.settings-row:last-child{border-bottom:none;padding-bottom:0;}
+.settings-row:first-child{padding-top:0;}
+.setting-label{font-size:0.85rem;font-weight:600;color:var(--text-bright);}
+.setting-desc{font-size:0.72rem;color:var(--text-dim);margin-top:2px;}
+.setting-control{min-width:120px;text-align:right;}
+.form-input{background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text-bright);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.2s;width:100%;}
+.form-input:focus{border-color:var(--green);}
+.form-input-group{position:relative;display:flex;gap:8px;}
+.show-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border2);border-radius:4px;padding:0 10px;color:var(--text-dim);cursor:pointer;font-size:0.75rem;white-space:nowrap;}
+.show-btn:hover{color:var(--green);}
+.toggle{width:44px;height:24px;background:var(--border2);border-radius:100px;cursor:pointer;position:relative;transition:background 0.3s;flex-shrink:0;}
+.toggle.on{background:var(--green);}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform 0.3s;}
+.toggle.on .toggle-thumb{transform:translateX(20px);}
+.select-input{background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text-bright);font-family:'DM Sans',sans-serif;font-size:0.82rem;outline:none;cursor:pointer;}
+.range-input{width:120px;accent-color:var(--green);}
+.range-val{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--green);margin-left:8px;}
+.btn-save{background:var(--green);color:var(--black);border:none;border-radius:6px;padding:11px 28px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.btn-save:hover{background:var(--green2);}
+.btn-danger{background:rgba(255,51,102,0.1);color:var(--red);border:1px solid rgba(255,51,102,0.2);border-radius:6px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;transition:all 0.2s;}
+.btn-danger:hover{background:rgba(255,51,102,0.2);}
+.btn-test{background:rgba(14,165,233,0.1);color:var(--blue);border:1px solid rgba(14,165,233,0.2);border-radius:6px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:0.82rem;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+.btn-test:hover{background:rgba(14,165,233,0.2);}
+.alert-box{padding:12px 16px;border-radius:6px;font-size:0.8rem;margin-bottom:16px;display:none;}
+.alert-success{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);color:var(--green);}
+.alert-error{background:rgba(255,51,102,0.08);border:1px solid rgba(255,51,102,0.2);color:var(--red);}
+.key-status{display:flex;align-items:center;gap:6px;font-size:0.72rem;margin-top:8px;}
+.key-status.valid{color:var(--green);}
+.key-status.invalid{color:var(--red);}
+.key-status.pending{color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo">VYORA<span>.</span>TRADE</div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a>
+    <a href="signals.html" class="nav-item"><span>🎯</span> Sinyal Live</a>
+    <a href="bot.html" class="nav-item"><span>🤖</span> Auto Bot</a>
+    <a href="trades.html" class="nav-item"><span>📋</span> Riwayat Trade</a>
+    <a href="ai-chat.html" class="nav-item"><span>🧠</span> AI Advisor</a>
+    <a href="portfolio.html" class="nav-item"><span>💼</span> Portfolio</a>
+    <a href="settings.html" class="nav-item active"><span>⚙️</span> Settings</a>
+    <a href="billing.html" class="nav-item"><span>💳</span> Billing</a>
+    <a href="login.html" class="nav-item"><span>🚪</span> Logout</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">👤</div>
+      <div><div class="user-name" id="sidebar-user-name">Loading...</div><div class="user-plan">✦ Trial — 6 hari</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="page-title">SETTINGS</div>
+    <button class="btn-save" onclick="saveAll()">💾 Simpan Semua</button>
+  </div>
+  <div class="content">
+
+    <!-- ALERT -->
+    <div class="alert-box alert-success" id="alert-success">✅ Pengaturan berhasil disimpan!</div>
+    <div class="alert-box alert-error" id="alert-error">❌ Gagal menyimpan. Cek kembali API key kamu.</div>
+
+    <!-- BINANCE API -->
+    <div class="settings-section">
+      <div class="section-title">🔑 Binance API Key</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">API Key</div>
+            <div class="setting-desc">Dapatkan di Binance → Profile → API Management</div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <div class="form-input-group">
+            <input type="password" class="form-input" id="api-key" placeholder="Masukkan Binance API Key kamu">
+            <button class="show-btn" onclick="toggleInput('api-key')">Tampilkan</button>
+          </div>
+          <div class="key-status pending" id="key-status">○ Belum diverifikasi</div>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:0.72rem;color:var(--text-dim);display:block;margin-bottom:6px">API Secret</label>
+          <div class="form-input-group">
+            <input type="password" class="form-input" id="api-secret" placeholder="Masukkan API Secret kamu">
+            <button class="show-btn" onclick="toggleInput('api-secret')">Tampilkan</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn-test" onclick="testApiKey()">🔍 Test Koneksi</button>
+          <div style="font-size:0.72rem;color:var(--text-dim)">API key disimpan terenkripsi AES-256</div>
+        </div>
+        <div style="margin-top:14px;padding:12px;background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.15);border-radius:6px;font-size:0.75rem;color:var(--gold)">
+          ⚠️ Pastikan API key TIDAK punya izin Withdraw. Hanya aktifkan: Enable Reading + Enable Spot Trading
+        </div>
+      </div>
+    </div>
+
+    <!-- BOT STRATEGY -->
+    <div class="settings-section">
+      <div class="section-title">🤖 Konfigurasi Bot</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Auto Trading</div>
+            <div class="setting-desc">Bot entry dan exit secara otomatis</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle on" id="toggle-auto" onclick="toggleSetting('toggle-auto')"><div class="toggle-thumb"></div></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Trading Pair</div>
+            <div class="setting-desc">Crypto yang dipantau bot</div>
+          </div>
+          <div class="setting-control">
+            <select class="select-input">
+              <option>BTC/USDT</option>
+              <option>ETH/USDT</option>
+              <option>BNB/USDT</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Timeframe</div>
+            <div class="setting-desc">Interval analisa sinyal</div>
+          </div>
+          <div class="setting-control">
+            <select class="select-input">
+              <option>15 menit</option>
+              <option>1 jam</option>
+              <option>4 jam</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Take Profit</div>
+            <div class="setting-desc">Target profit per trade</div>
+          </div>
+          <div class="setting-control" style="display:flex;align-items:center">
+            <input type="range" class="range-input" min="1" max="10" value="3" id="tp-range" oninput="document.getElementById('tp-val').textContent=this.value+'%'">
+            <span class="range-val" id="tp-val">3%</span>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Stop Loss</div>
+            <div class="setting-desc">Batas maksimal kerugian per trade</div>
+          </div>
+          <div class="setting-control" style="display:flex;align-items:center">
+            <input type="range" class="range-input" min="0.5" max="5" step="0.5" value="1.5" id="sl-range" oninput="document.getElementById('sl-val').textContent=this.value+'%'">
+            <span class="range-val" id="sl-val">1.5%</span>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Min Confidence</div>
+            <div class="setting-desc">Minimum confidence AI untuk entry</div>
+          </div>
+          <div class="setting-control">
+            <select class="select-input">
+              <option>HIGH only</option>
+              <option>HIGH + MEDIUM</option>
+              <option>Semua sinyal</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFIKASI -->
+    <div class="settings-section">
+      <div class="section-title">🔔 Notifikasi</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Notifikasi Telegram</div>
+            <div class="setting-desc">Dapat alert sinyal & trade via Telegram</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle on" onclick="toggleSetting(this)"><div class="toggle-thumb"></div></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Telegram Bot Token</div>
+            <div class="setting-desc">Buat bot di @BotFather lalu copy token</div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <input type="text" class="form-input" placeholder="1234567890:AABBccDD...">
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Telegram Chat ID</div>
+            <div class="setting-desc">Chat dengan @userinfobot untuk dapat ID</div>
+          </div>
+        </div>
+        <div style="margin-bottom:12px">
+          <input type="text" class="form-input" placeholder="-1001234567890">
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Alert saat BUY</div>
+            <div class="setting-desc">Notifikasi saat bot entry posisi</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle on" onclick="toggleSetting(this)"><div class="toggle-thumb"></div></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Alert saat SELL</div>
+            <div class="setting-desc">Notifikasi saat TP atau SL hit</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle on" onclick="toggleSetting(this)"><div class="toggle-thumb"></div></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Signal Alert</div>
+            <div class="setting-desc">Notifikasi setiap sinyal HIGH muncul</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle" onclick="toggleSetting(this)"><div class="toggle-thumb"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEAMANAN -->
+    <div class="settings-section">
+      <div class="section-title">🔐 Keamanan</div>
+      <div class="settings-card">
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Two-Factor Authentication</div>
+            <div class="setting-desc">Keamanan tambahan untuk akun kamu</div>
+          </div>
+          <div class="setting-control">
+            <div class="toggle" onclick="toggleSetting(this)"><div class="toggle-thumb"></div></div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Ganti Password</div>
+            <div class="setting-desc">Update password secara berkala</div>
+          </div>
+          <div class="setting-control">
+            <button class="btn-test" onclick="alert('Fitur segera hadir!')">Ganti</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="setting-label">Hapus Akun</div>
+            <div class="setting-desc" style="color:var(--red)">Aksi ini tidak bisa dibatalkan</div>
+          </div>
+          <div class="setting-control">
+            <button class="btn-danger" onclick="if(confirm('Yakin ingin hapus akun?'))alert('Akun dihapus')">Hapus</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:8px">
+      <button class="btn-danger" onclick="window.location.href='dashboard.html'">Batal</button>
+      <button class="btn-save" onclick="saveAll()">💾 Simpan Semua</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleInput(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function toggleSetting(el) {
+  el.classList.toggle('on');
+}
+
+async function testApiKey() {
+  const key = document.getElementById('api-key').value;
+  const statusEl = document.getElementById('key-status');
+
+  if(!key) { statusEl.className='key-status invalid'; statusEl.textContent='✗ Masukkan API key dulu'; return; }
+
+  statusEl.className='key-status pending';
+  statusEl.textContent='⟳ Menguji koneksi...';
+
+  // Simulasi test
+  setTimeout(() => {
+    if(key.length > 10) {
+      statusEl.className='key-status valid';
+      statusEl.textContent='✓ Koneksi berhasil · Balance: $14.01 USDT';
+    } else {
+      statusEl.className='key-status invalid';
+      statusEl.textContent='✗ API key tidak valid';
+    }
+  }, 1500);
+}
+
+function saveAll() {
+  const successEl = document.getElementById('alert-success');
+  successEl.style.display = 'block';
+  setTimeout(() => successEl.style.display='none', 3000);
+}
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
+</script>
+<footer style="text-align:center;padding:20px;font-size:0.65rem;color:#3a4a5a;letter-spacing:2px;text-transform:uppercase;border-top:1px solid #141b26;margin-top:40px">Vyora by J-CUBE | All Digital In One Cube · Bali, Indonesia · 2026</footer>
+</body>
+</html>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){window.location.href='login.html';return;}
+  const snap=await getDoc(doc(db,'users',u.uid));
+  if(snap.exists()){
+    const d=snap.data();
+    const nm=document.getElementById('sidebar-user-name');
+    const pl=document.getElementById('sidebar-user-plan');
+    if(nm)nm.textContent=d.name||u.email;
+    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+  }
+});
+window.doLogout=async()=>{
+  if(confirm('Yakin mau logout?')){
+    await signOut(auth);
+    window.location.href='login.html';
+  }
+};
+</script>
