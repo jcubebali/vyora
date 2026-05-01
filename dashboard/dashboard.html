@@ -459,35 +459,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
           <div class="panel-title">📋 Riwayat Trade</div>
           <a href="trades.html" class="panel-action">Lihat semua →</a>
         </div>
-        <div id="trade-history">
-          <div class="trade-row">
-            <div class="trade-side-badge badge-sell-tp">SELL TP</div>
-            <div class="trade-pair">BTC/USDT</div>
-            <div class="trade-price">$78,316.45</div>
-            <div class="trade-pnl" style="color:var(--green)">+$0.043</div>
-            <div class="trade-time">27 Apr 03:23</div>
-          </div>
-          <div class="trade-row">
-            <div class="trade-side-badge badge-buy">BUY</div>
-            <div class="trade-pair">BTC/USDT</div>
-            <div class="trade-price">$77,619.99</div>
-            <div class="trade-pnl" style="color:var(--text-dim)">—</div>
-            <div class="trade-time">26 Apr 07:44</div>
-          </div>
-          <div class="trade-row">
-            <div class="trade-side-badge badge-sell-tp">SELL TP</div>
-            <div class="trade-pair">BTC/USDT</div>
-            <div class="trade-price">$76,359.23</div>
-            <div class="trade-pnl" style="color:var(--green)">+$0.12</div>
-            <div class="trade-time">21 Apr 20:26</div>
-          </div>
-          <div class="trade-row">
-            <div class="trade-side-badge badge-buy">BUY</div>
-            <div class="trade-pair">BTC/USDT</div>
-            <div class="trade-price">$74,578.30</div>
-            <div class="trade-pnl" style="color:var(--text-dim)">—</div>
-            <div class="trade-time">14 Apr 21:35</div>
-          </div>
+        <div id="trade-history"><div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Loading...</div></div></div>
         </div>
       </div>
 
@@ -734,7 +706,7 @@ setInterval(refreshSignal, 15*60*1000);
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e",storageBucket:"nexus-trade-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
 const auth=getAuth(app);
 const db=getFirestore(app);
@@ -762,6 +734,7 @@ onAuthStateChanged(auth,async(u)=>{
     if(d){
       if(nm)nm.textContent=d.name||u.displayName||u.email.split('@')[0];
       if(pl)pl.textContent='\u2756 '+(d.plan||'trial').toUpperCase();
+      loadTradeHistory(u.uid);
       const pb=document.getElementById('total-profit');
       const bv=document.getElementById('balance-val');
       if(pb)pb.textContent='$'+(d.totalPnl||0).toFixed(4);
@@ -776,11 +749,107 @@ onAuthStateChanged(auth,async(u)=>{
     }
   }catch(e){console.error("Firestore error:",e);}
 });
+
+async function loadTradeHistory(uid) {
+  const th = document.getElementById('trade-history');
+  if (!th) return;
+  try {
+    const q = query(collection(db,'trades'), where('uid','==',uid), orderBy('timestamp','desc'), limit(5));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat trade</div>';
+      return;
+    }
+    let html = '';
+    snap.forEach(d => {
+      const t = d.data();
+      const pnl = t.pnlUsdt || 0;
+      const pnlColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      const pnlStr = pnl !== 0 ? (pnl>=0?'+':'')+'\$'+Math.abs(pnl).toFixed(3) : '-';
+      const date = t.timestamp ? new Date(t.timestamp).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '-';
+      html += '<div class="trade-row">'
+        +'<div class="trade-side-badge '+(pnl>=0?'badge-sell-tp':'badge-sell')+'">'+( t.side||'-')+'</div>'
+        +'<div class="trade-pair">'+(t.symbol||'-')+'</div>'
+        +'<div class="trade-price">\$'+((t.exitPrice||t.entryPrice||0)).toLocaleString()+'</div>'
+        +'<div class="trade-pnl" style="color:'+pnlColor+'">'+pnlStr+'</div>'
+        +'<div class="trade-time">'+date+'</div>'
+        +'</div>';
+    });
+    th.innerHTML = html;
+  } catch(e) {
+    console.error('loadTradeHistory:',e);
+    th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat</div>';
+  }
+}
 window._loggingOut=false;
 window.doLogout=async()=>{
   if(confirm('Yakin mau logout?')){
     window._loggingOut=true;
-    try{await signOut(auth);sessionStorage.clear();window.location.replace("login.html");}catch(e){window._loggingOut=false;}
-  } else {window._loggingOut=false;}
+    try{await signOut(auth);sessionStorage.clear();window.location.replace("login.html");}catch(e){
+async function loadTradeHistory(uid) {
+  const th = document.getElementById('trade-history');
+  if (!th) return;
+  try {
+    const q = query(collection(db,'trades'), where('uid','==',uid), orderBy('timestamp','desc'), limit(5));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat trade</div>';
+      return;
+    }
+    let html = '';
+    snap.forEach(d => {
+      const t = d.data();
+      const pnl = t.pnlUsdt || 0;
+      const pnlColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      const pnlStr = pnl !== 0 ? (pnl>=0?'+':'')+'\$'+Math.abs(pnl).toFixed(3) : '-';
+      const date = t.timestamp ? new Date(t.timestamp).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '-';
+      html += '<div class="trade-row">'
+        +'<div class="trade-side-badge '+(pnl>=0?'badge-sell-tp':'badge-sell')+'">'+( t.side||'-')+'</div>'
+        +'<div class="trade-pair">'+(t.symbol||'-')+'</div>'
+        +'<div class="trade-price">\$'+((t.exitPrice||t.entryPrice||0)).toLocaleString()+'</div>'
+        +'<div class="trade-pnl" style="color:'+pnlColor+'">'+pnlStr+'</div>'
+        +'<div class="trade-time">'+date+'</div>'
+        +'</div>';
+    });
+    th.innerHTML = html;
+  } catch(e) {
+    console.error('loadTradeHistory:',e);
+    th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat</div>';
+  }
+}
+window._loggingOut=false;}
+  } else {
+async function loadTradeHistory(uid) {
+  const th = document.getElementById('trade-history');
+  if (!th) return;
+  try {
+    const q = query(collection(db,'trades'), where('uid','==',uid), orderBy('timestamp','desc'), limit(5));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat trade</div>';
+      return;
+    }
+    let html = '';
+    snap.forEach(d => {
+      const t = d.data();
+      const pnl = t.pnlUsdt || 0;
+      const pnlColor = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      const pnlStr = pnl !== 0 ? (pnl>=0?'+':'')+'\$'+Math.abs(pnl).toFixed(3) : '-';
+      const date = t.timestamp ? new Date(t.timestamp).toLocaleDateString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '-';
+      html += '<div class="trade-row">'
+        +'<div class="trade-side-badge '+(pnl>=0?'badge-sell-tp':'badge-sell')+'">'+( t.side||'-')+'</div>'
+        +'<div class="trade-pair">'+(t.symbol||'-')+'</div>'
+        +'<div class="trade-price">\$'+((t.exitPrice||t.entryPrice||0)).toLocaleString()+'</div>'
+        +'<div class="trade-pnl" style="color:'+pnlColor+'">'+pnlStr+'</div>'
+        +'<div class="trade-time">'+date+'</div>'
+        +'</div>';
+    });
+    th.innerHTML = html;
+  } catch(e) {
+    console.error('loadTradeHistory:',e);
+    th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat</div>';
+  }
+}
+window._loggingOut=false;}
 };
 </script>

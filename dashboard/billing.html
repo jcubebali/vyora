@@ -457,14 +457,37 @@ function selectPM(el) {
   el.classList.add('selected');
 }
 
-function processPayment() {
+async function processPayment() {
   const btn = document.querySelector('.btn-pay');
   btn.textContent = '⏳ Memproses...';
   btn.disabled = true;
-  setTimeout(() => {
-    document.getElementById('payment-form-wrap').style.display = 'none';
-    document.getElementById('payment-success').style.display = 'block';
-  }, 2000);
+  try {
+    const user = auth.currentUser;
+    if (!user) { alert('Login dulu!'); btn.disabled=false; btn.textContent='💳 Bayar Sekarang'; return; }
+    const planLower = selectedPlan.toLowerCase();
+    const res = await fetch('/api/create-snap-token', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({plan:planLower, period:'monthly', name:user.displayName||'Trader', email:user.email, uid:user.uid})
+    });
+    const data = await res.json();
+    if (!data.token) throw new Error(data.error||'Token gagal');
+    window.snap.pay(data.token, {
+      onSuccess: async (result) => {
+        const {getFirestore,doc,updateDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+        const db = getFirestore();
+        const expiry = new Date(); expiry.setMonth(expiry.getMonth()+1);
+        await updateDoc(doc(db,"users",user.uid), {plan:planLower, planExpiry:expiry.toISOString(), lastPayment:new Date().toISOString(), orderId:result.order_id});
+        document.getElementById("payment-form-wrap").style.display="none";
+        document.getElementById("payment-success").style.display="block";
+        setTimeout(()=>window.location.reload(), 3000);
+      },
+      onError:(r)=>{ alert("Gagal: "+(r.status_message||"Error")); btn.disabled=false; btn.textContent="💳 Bayar Sekarang"; },
+      onClose:()=>{ btn.disabled=false; btn.textContent="💳 Bayar Sekarang"; }
+    });
+  } catch(e) {
+    alert("Error: "+e.message);
+    btn.disabled=false; btn.textContent="💳 Bayar Sekarang";
+  }
 }
 
 // Close modal on overlay click
