@@ -98,6 +98,9 @@ nav {
 
 /* HERO */
 .hero {
+  background-image: url('https://res.cloudinary.com/dbckdslrw/image/upload/v1777649388/1777648241057_eqv0pq.png');
+  background-size: cover;
+  background-position: center top;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -107,6 +110,14 @@ nav {
   overflow: hidden;
 }
 
+.hero-bottom-fade {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 250px;
+  background: linear-gradient(to bottom, transparent, var(--black));
+  pointer-events: none;
+  z-index: 1;
+}
 .hero-glow {
   position: absolute;
   width: 800px;
@@ -941,6 +952,11 @@ footer {
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="dashboard/login.html" class="nav-cta">Mulai Gratis</a></li>
   </ul>
+  <div style="display:flex;align-items:center;gap:6px;margin-left:16px">
+    <button onclick="setLang('id')" id="btn-id" style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">ID</button>
+    <button onclick="setLang('en')" id="btn-en" style="background:transparent;border:1px solid #1a2535;color:#445566;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">EN</button>
+  </div>
+</ul>
 </nav>
 
 <!-- TICKER -->
@@ -964,7 +980,7 @@ footer {
 </div>
 
 <!-- HERO -->
-<section class="hero">
+<section class="hero"><div style="position:absolute;inset:0;background:rgba(2,3,5,0.65);z-index:0"></div><div class="hero-bottom-fade"></div>
   <div class="hero-glow"></div>
   <div class="hero-content">
     <div class="hero-badge">INTELLIGENT CRYPTO TRADING</div>
@@ -1296,5 +1312,64 @@ function updatePrice() {
 }
 setInterval(updatePrice, 3000);
 </script>
+
+<script>
+const translations = {
+  id: {
+    'hero-h1': 'BIARKAN <span class="accent">AI</span><br>YANG <span class="outline">TRADING</span><br>UNTUK KAMU',
+    'hero-sub': 'Vyora menggunakan kecerdasan buatan untuk menganalisis pasar crypto, mengeksekusi order otomatis, dan menghasilkan <strong>passive income</strong> — bahkan saat kamu tidur.',
+    'hero-btn1': '🚀 Coba Gratis 7 Hari',
+    'hero-btn2': 'Lihat Cara Kerja →',
+    'how-label': '// Cara Kerja',
+    'how-title': '3 LANGKAH<br>MULAI PROFIT',
+    'how-sub': 'Setup sekali, bot jalan terus. Tidak perlu pengalaman trading.',
+    'cta-btn': '🚀 Daftar Sekarang — Gratis',
+    'cta-note': '✓ No credit card &nbsp;·&nbsp; ✓ 7 hari free trial &nbsp;·&nbsp; ✓ Cancel anytime',
+  },
+  en: {
+    'hero-h1': 'LET <span class="accent">AI</span><br><span class="outline">TRADE</span><br>FOR YOU',
+    'hero-sub': 'Vyora uses artificial intelligence to analyze crypto markets, execute orders automatically, and generate <strong>passive income</strong> — even while you sleep.',
+    'hero-btn1': '🚀 Start Free 7 Days',
+    'hero-btn2': 'See How It Works →',
+    'how-label': '// How It Works',
+    'how-title': '3 STEPS TO<br>START EARNING',
+    'how-sub': 'Setup once, bot runs forever. No trading experience needed.',
+    'cta-btn': '🚀 Sign Up Now — Free',
+    'cta-note': '✓ No credit card &nbsp;·&nbsp; ✓ 7-day free trial &nbsp;·&nbsp; ✓ Cancel anytime',
+  }
+};
+
+function setLang(lang) {
+  const t = translations[lang];
+  // Hero
+  const h1 = document.querySelector('.hero h1');
+  if (h1) h1.innerHTML = t['hero-h1'];
+  const sub = document.querySelector('.hero-sub');
+  if (sub) sub.innerHTML = t['hero-sub'];
+  const btn1 = document.querySelector('.btn-primary');
+  if (btn1) btn1.innerHTML = t['hero-btn1'];
+  const btn2 = document.querySelector('.btn-secondary');
+  if (btn2) btn2.innerHTML = t['hero-btn2'];
+  const howLabel = document.querySelector('#how .section-label');
+  if (howLabel) howLabel.textContent = t['how-label'];
+  const howTitle = document.querySelector('#how .section-title');
+  if (howTitle) howTitle.innerHTML = t['how-title'];
+  const howSub = document.querySelector('#how .section-sub');
+  if (howSub) howSub.textContent = t['how-sub'];
+  const ctaBtn = document.querySelector('.cta-section .btn-primary');
+  if (ctaBtn) ctaBtn.innerHTML = t['cta-btn'];
+  const ctaNote = document.querySelector('.cta-note');
+  if (ctaNote) ctaNote.innerHTML = t['cta-note'];
+
+  // Toggle button styles
+  document.getElementById('btn-id').style.cssText = lang === 'id'
+    ? 'background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif'
+    : 'background:transparent;border:1px solid #1a2535;color:#445566;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif';
+  document.getElementById('btn-en').style.cssText = lang === 'en'
+    ? 'background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif'
+    : 'background:transparent;border:1px solid #1a2535;color:#445566;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif';
+}
+</script>
+
 </body>
 </html>
