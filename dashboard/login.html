@@ -165,6 +165,8 @@ function showOk(m){const e=document.getElementById('aok');e.textContent='✅ '+m
 async function tick(){try{const r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');const d=await r.json();const p=parseFloat(d.price);document.getElementById('lp').textContent='$'+p.toLocaleString('en',{maximumFractionDigits:0});document.getElementById('ltp').textContent='TP $'+(p*1.03).toLocaleString('en',{maximumFractionDigits:0});document.getElementById('lsl').textContent='SL $'+(p*0.985).toLocaleString('en',{maximumFractionDigits:0});}catch(e){}}
 tick();setInterval(tick,30000);
 </script>
-<footer style="text-align:center;padding:20px;font-size:0.65rem;color:#3a4a5a;letter-spacing:2px;text-transform:uppercase;border-top:1px solid #141b26;margin-top:40px">Vyora by J-CUBE | All Digital In One Cube · Bali, Indonesia · 2026</footer>
+
+
+<footer style="text-align:center;padding:20px;font-size:0.65rem;color:#3a4a5a;letter-spacing:2px;text-transform:uppercase;border-top:1px solid #141b26;margin-top:40px">Vyora by J-CUBE &nbsp;|&nbsp; All Digital In One Cube &nbsp;&middot;&nbsp; Bali, Indonesia &nbsp;&middot;&nbsp; 2026</footer>
 </body>
 </html>
