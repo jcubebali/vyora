@@ -415,7 +415,7 @@ let isYearly = false;
 let selectedPlan = '';
 let selectedAmount = '';
 
-function toggleBilling() {
+window.toggleBilling=function() {
   isYearly = !isYearly;
   const sw = document.getElementById('billing-sw');
   sw.classList.toggle('on', isYearly);
@@ -441,7 +441,7 @@ function toggleBilling() {
   }
 }
 
-function openPayment(plan, amount) {
+window.openPayment=function(plan, amount) {
   selectedPlan = plan;
   selectedAmount = amount;
   document.getElementById('order-plan').textContent = plan;
@@ -453,7 +453,7 @@ function openPayment(plan, amount) {
   document.getElementById('payment-form-wrap').style.display = 'block';
 }
 
-function closePayment() {
+window.closePayment=function() {
   document.getElementById('payment-modal').classList.remove('show');
 }
 
@@ -462,7 +462,7 @@ function selectPM(el) {
   el.classList.add('selected');
 }
 
-async function processPayment() {
+window.processPayment=async function() {
   const btn = document.querySelector('.btn-pay');
   btn.textContent = '⏳ Memproses...';
   btn.disabled = true;
