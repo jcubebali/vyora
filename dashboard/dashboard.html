@@ -783,6 +783,4 @@ window.doLogout=async()=>{
     try{await signOut(auth);sessionStorage.clear();window.location.replace("login.html");}catch(e){window._loggingOut=false;}
   } else {window._loggingOut=false;}
 };
-  }
-};
 </script>
