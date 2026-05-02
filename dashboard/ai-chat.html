@@ -353,30 +353,17 @@ async function sendMessage() {
   document.getElementById('send-btn').disabled = true;
   showTyping();
 
-  // Find matching response
-  const lower = msg.toLowerCase();
-  let responseText = DEFAULT_RESPONSE;
-
-  for(const r of AI_RESPONSES) {
-    if(r.trigger.some(t => lower.includes(t))) {
-      if(typeof r.response === 'function') {
-        const result = r.response();
-        if(result instanceof Promise) {
-          responseText = await result;
-        } else {
-          responseText = result;
-        }
-      }
-      break;
-    }
-  }
-
-  setTimeout(() => {
+  // Groq AI response
+  try {
+    const responseText = await askGroqAI(msg);
     removeTyping();
     addAIMessage(responseText);
-    isTyping = false;
-    document.getElementById('send-btn').disabled = false;
-  }, 1000 + Math.random() * 1000);
+  } catch(e) {
+    removeTyping();
+    addAIMessage('Maaf, terjadi kesalahan. Coba lagi.');
+  }
+  isTyping = false;
+  document.getElementById('send-btn').disabled = false;
 }
 
 function sendQuick(el) {
@@ -439,6 +426,42 @@ function removeTyping() {
   if(el) el.remove();
 }
 
+const GROQ_KEY = "PASTE_GROQ_KEY_HERE";
+
+async function askGroqAI(userMessage) {
+  try {
+    const btcPrice = document.getElementById('live-price')?.textContent || '$78,000';
+    const systemPrompt = `Kamu adalah AI Trading Advisor profesional untuk platform Vyora. 
+Harga BTC saat ini: ${btcPrice}. 
+Jawab dalam bahasa Indonesia, singkat, padat, dan actionable. 
+Selalu tambahkan disclaimer bahwa ini bukan rekomendasi investasi.`;
+
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + GROQ_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {role: 'system', content: systemPrompt},
+          {role: 'user', content: userMessage}
+        ],
+        max_tokens: 300,
+        temperature: 0.3
+      })
+    });
+    const data = await r.json();
+    if (data.choices) {
+      return data.choices[0].message.content;
+    }
+    return 'Maaf, AI sedang tidak tersedia. Coba lagi nanti.';
+  } catch(e) {
+    return 'Error: ' + e.message;
+  }
+}
+
 function newChat() {
   document.getElementById('chat-messages').innerHTML = '';
   addAIMessage('Chat baru dimulai! Tanyakan apapun tentang trading crypto. 🚀');
@@ -472,7 +495,7 @@ setInterval(updateLivePrice, 30000);
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"nexus-trade-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
 const auth=getAuth(app);
 const db=getFirestore(app);
 onAuthStateChanged(auth,async(u)=>{
