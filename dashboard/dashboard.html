@@ -267,7 +267,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="page-title">DASHBOARD</div>
       <div class="topbar-status">
         <div class="status-dot"></div>
-        Bot Aktif · Cycle #47
+        Bot Aktif · Cycle #0
       </div>
     </div>
     <div class="topbar-right">
@@ -328,7 +328,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       </div>
       <div class="bot-stats">
         <div class="bot-stat">
-          <div class="bot-stat-val" id="cycles">47</div>
+          <div class="bot-stat-val" id="cycles">0</div>
           <div class="bot-stat-label">Cycles</div>
         </div>
         <div class="bot-stat">
@@ -620,7 +620,7 @@ function startBot() {
 }
 
 // ── Bot Log ─────────────────────────────────────
-let cycleCount = 47;
+let cycleCount = 0;
 function addLog(msg, type='') {
   const log = document.getElementById('bot-log');
   const now = new Date().toLocaleTimeString('id');
