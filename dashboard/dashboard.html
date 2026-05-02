@@ -823,6 +823,7 @@ onAuthStateChanged(auth,async(u)=>{
       window._vyoraUid = u.uid;
       renderChartFromFirestore(u.uid, '30d');
       loadOpenPositions(u.uid);
+      syncBotStatus();
       const pb=document.getElementById('total-profit');
       const bv=document.getElementById('balance-val');
       if(pb)pb.textContent='$'+(d.totalPnl||0).toFixed(4);
