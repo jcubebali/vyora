@@ -646,6 +646,7 @@ async function syncBotStatus() {
   } catch(e) { console.error("syncBotStatus:", e); }
 }
 setInterval(syncBotStatus, 30000);
+syncBotStatus();
 function addLog(msg, type='') {
   const log = document.getElementById('bot-log');
   const now = new Date().toLocaleTimeString('id');

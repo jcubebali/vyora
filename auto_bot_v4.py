@@ -371,9 +371,9 @@ class AutoBot:
                 token = get_token()
                 uid = open(os.path.expanduser("~/.nexus_uid")).read().strip()
                 doc = {"fields": {
-                    "botCycle": {"integerValue": str(cycle)},
+                    "botCycle": {"stringValue": str(cycle)},
                     "botStatus": {"stringValue": "RUNNING"},
-                    "botLastSeen": {"timestampValue": datetime.now().isoformat()}
+                    "botLastSeen": {"stringValue": datetime.now().isoformat()}
                 }}
                 mask = "updateMask.fieldPaths=botCycle&updateMask.fieldPaths=botStatus&updateMask.fieldPaths=botLastSeen"
                 url = f"https://firestore.googleapis.com/v1/projects/nexus-trade-e449e/databases/(default)/documents/users/{uid}?{mask}"
