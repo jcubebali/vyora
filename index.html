@@ -1104,24 +1104,24 @@ footer {
             <div class="signal-dot"></div>
             <span class="signal-label">AI Signal · BTC/USDT · Live</span>
           </div>
-          <div class="signal-action">BUY</div>
+          <div class="signal-action" id="demo-signal">BUY</div>
           <div class="signal-confidence">HIGH CONFIDENCE · 71%</div>
           <div class="signal-grid">
             <div class="signal-item">
               <div class="signal-item-label">Harga BTC</div>
-              <div class="signal-item-value">$77,615</div>
+              <div class="signal-item-value" id="demo-price">Loading...</div>
             </div>
             <div class="signal-item">
               <div class="signal-item-label">RSI (14)</div>
-              <div class="signal-item-value" style="color:var(--gold)">56.1</div>
+              <div class="signal-item-value" style="color:var(--gold)" id="demo-rsi">56.1</div>
             </div>
             <div class="signal-item">
               <div class="signal-item-label">Take Profit</div>
-              <div class="signal-item-value tp-value">$79,943</div>
+              <div class="signal-item-value tp-value" id="demo-tp">--</div>
             </div>
             <div class="signal-item">
               <div class="signal-item-label">Stop Loss</div>
-              <div class="signal-item-value sl-value">$76,459</div>
+              <div class="signal-item-value sl-value" id="demo-sl">--</div>
             </div>
           </div>
           <div class="indicators">
@@ -1129,6 +1129,9 @@ footer {
             <span class="indicator pass">RSI ✓</span>
             <span class="indicator fail">VOL ✗</span>
             <span class="indicator pass">MA200 ✓</span>
+          </div>
+          <div style="margin-top:12px;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px;font-size:0.6rem;color:var(--text-dim);letter-spacing:1px;text-align:center">
+            ⚠️ DEMO SIGNAL · BUKAN REKOMENDASI INVESTASI · SELALU LAKUKAN RISET SENDIRI
           </div>
         </div>
       </div>
@@ -1294,6 +1297,30 @@ footer {
 </footer>
 
 <script>
+// Fetch real-time BTC price
+async function updateDemoSignal() {
+  try {
+    const r = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+    const data = await r.json();
+    const price = parseFloat(data.price);
+    const tp = (price * 1.03).toFixed(2);
+    const sl = (price * 0.985).toFixed(2);
+    
+    const priceEl = document.getElementById('demo-price');
+    const tpEl = document.getElementById('demo-tp');
+    const slEl = document.getElementById('demo-sl');
+    
+    if(priceEl) priceEl.textContent = '$' + price.toLocaleString('en-US', {minimumFractionDigits:2});
+    if(tpEl) tpEl.textContent = '$' + parseFloat(tp).toLocaleString('en-US', {minimumFractionDigits:2});
+    if(slEl) slEl.textContent = '$' + parseFloat(sl).toLocaleString('en-US', {minimumFractionDigits:2});
+  } catch(e) {
+    console.error('Price fetch error:', e);
+  }
+}
+
+updateDemoSignal();
+setInterval(updateDemoSignal, 30000);
+
 // Scroll reveal
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
