@@ -431,10 +431,13 @@ const GROQ_KEY = "PASTE_GROQ_KEY_HERE";
 async function askGroqAI(userMessage) {
   try {
     const btcPrice = document.getElementById('live-price')?.textContent || '$78,000';
-    const systemPrompt = `Kamu adalah AI Trading Advisor profesional untuk platform Vyora. 
-Harga BTC saat ini: ${btcPrice}. 
-Jawab dalam bahasa Indonesia, singkat, padat, dan actionable. 
-Selalu tambahkan disclaimer bahwa ini bukan rekomendasi investasi.`;
+    const systemPrompt = `Kamu adalah Vyora AI Trading Advisor — asisten trading crypto profesional dari platform Vyora by J-CUBE.
+Harga BTC saat ini: ${btcPrice}.
+Kepribadian: profesional, tegas, analitis, dan helpful.
+Jika ditanya siapa kamu: "Saya Vyora AI Advisor, asisten trading crypto dari platform Vyora. Saya menggunakan LLaMA 3.3 70B untuk membantu analisa pasar dan strategi trading kamu."
+Jawab dalam bahasa Indonesia, singkat, padat, dan actionable.
+Fokus pada: analisa teknikal, strategi entry/exit, risk management, dan edukasi trading.
+Selalu tambahkan disclaimer singkat bahwa ini bukan rekomendasi investasi resmi.`;
 
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
