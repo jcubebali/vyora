@@ -823,7 +823,17 @@ onAuthStateChanged(auth,async(u)=>{
       window._vyoraUid = u.uid;
       renderChartFromFirestore(u.uid, '30d');
       loadOpenPositions(u.uid);
-      syncBotStatus();
+      // Baca botCycle langsung dari data Firestore
+      if(d.botCycle) {
+        const cyc = parseInt(d.botCycle) || 0;
+        cycleCount = cyc;
+        const cycEl = document.getElementById('cycles');
+        if(cycEl) cycEl.textContent = cyc;
+        document.querySelector('.topbar-status').innerHTML = '<div class="status-dot"></div> Bot Aktif · Cycle #'+cyc;
+      }
+      if(d.botStatus === 'RUNNING') {
+        document.querySelector('.topbar-status').style.color = 'var(--green)';
+      }
       const pb=document.getElementById('total-profit');
       const bv=document.getElementById('balance-val');
       if(pb)pb.textContent='$'+(d.totalPnl||0).toFixed(4);
