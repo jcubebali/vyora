@@ -621,6 +621,31 @@ function startBot() {
 
 // ── Bot Log ─────────────────────────────────────
 let cycleCount = 0;
+// Baca cycle dari Firestore realtime
+async function syncBotStatus() {
+  try {
+    const snap = await getDoc(doc(db, "users", auth.currentUser?.uid || ""));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.botCycle) {
+        cycleCount = parseInt(data.botCycle);
+        document.getElementById("cycles").textContent = cycleCount;
+        document.querySelector(".topbar-status").innerHTML = 
+          "<div class=\"status-dot\"></div> Bot Aktif · Cycle #" + cycleCount;
+      }
+      if (data.botLastSeen) {
+        const lastSeen = new Date(data.botLastSeen);
+        const diff = (new Date() - lastSeen) / 1000 / 60;
+        if (diff > 20) {
+          document.querySelector(".topbar-status").style.color = "var(--red)";
+          document.querySelector(".topbar-status").innerHTML = 
+            "<div style=\"width:6px;height:6px;background:var(--red);border-radius:50%\"></div> Bot Offline";
+        }
+      }
+    }
+  } catch(e) { console.error("syncBotStatus:", e); }
+}
+setInterval(syncBotStatus, 30000);
 function addLog(msg, type='') {
   const log = document.getElementById('bot-log');
   const now = new Date().toLocaleTimeString('id');
