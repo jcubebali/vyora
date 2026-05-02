@@ -681,7 +681,9 @@ const aiResponses = [
   'Take Profit di +3% dan Stop Loss di -1.5% memberikan Risk:Reward ratio 1:2 — ini standar minimum untuk trading yang sehat dan sustainable.',
 ];
 
-function sendChat() {
+const GROQ_KEY_DASH = "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";
+
+async function sendChat() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
   if(!msg) return;
@@ -694,19 +696,48 @@ function sendChat() {
   userDiv.style.flexDirection = 'row-reverse';
   userDiv.innerHTML = `<div class="chat-avatar user">👤</div><div class="chat-bubble" style="text-align:right">${msg}</div>`;
   container.appendChild(userDiv);
-
   input.value = '';
+  container.scrollTop = container.scrollHeight;
 
-  // AI response
-  setTimeout(() => {
+  // Loading
+  const loadDiv = document.createElement('div');
+  loadDiv.className = 'chat-msg-wrap';
+  loadDiv.id = 'chat-loading';
+  loadDiv.innerHTML = `<div class="chat-avatar ai">🤖</div><div class="chat-bubble ai">...</div>`;
+  container.appendChild(loadDiv);
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + GROQ_KEY_DASH,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {role: 'system', content: 'You are Vyora AI Trading Advisor. Answer in the same language as user. Be concise and professional. This is not investment advice.'},
+          {role: 'user', content: msg}
+        ],
+        max_tokens: 200,
+        temperature: 0.3
+      })
+    });
+    const data = await r.json();
+    const resp = data.choices ? data.choices[0].message.content : 'Maaf, coba lagi.';
+    document.getElementById('chat-loading')?.remove();
     const aiDiv = document.createElement('div');
     aiDiv.className = 'chat-msg-wrap';
-    const resp = aiResponses[Math.floor(Math.random()*aiResponses.length)];
     aiDiv.innerHTML = `<div class="chat-avatar ai">🤖</div><div class="chat-bubble ai">${resp}</div>`;
     container.appendChild(aiDiv);
-    container.scrollTop = container.scrollHeight;
-  }, 800);
-
+  } catch(e) {
+    document.getElementById('chat-loading')?.remove();
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'chat-msg-wrap';
+    aiDiv.innerHTML = `<div class="chat-avatar ai">🤖</div><div class="chat-bubble ai">Error: coba lagi.</div>`;
+    container.appendChild(aiDiv);
+  }
   container.scrollTop = container.scrollHeight;
 }
 
