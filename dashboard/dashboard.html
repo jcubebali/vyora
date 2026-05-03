@@ -1092,11 +1092,11 @@ window._loggingOut=false;}
 // ── Lock System ──────────────────────────────────
 let _userPlan = localStorage.getItem('vyora_plan') || 'trial';
 
-function closePopup() {
+window.closePopup = function() {
   document.getElementById('upgrade-popup').style.display = 'none';
 }
 
-function checkAccess(e, feature, requiredPlan) {
+window.checkAccess = function(e, feature, requiredPlan) {
   e.preventDefault();
   _userPlan = localStorage.getItem('vyora_plan') || 'trial';
   const planOrder = {trial:0, basic:1, pro:2, elite:3};
