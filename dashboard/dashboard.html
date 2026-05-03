@@ -1087,4 +1087,51 @@ async function loadTradeHistory(uid) {
 }
 window._loggingOut=false;}
 };
+
+
+// ── Lock System ──────────────────────────────────
+let _userPlan = localStorage.getItem('vyora_plan') || 'trial';
+
+function closePopup() {
+  document.getElementById('upgrade-popup').classList.remove('show');
+}
+
+function checkAccess(e, feature, requiredPlan) {
+  e.preventDefault();
+  _userPlan = localStorage.getItem('vyora_plan') || 'trial';
+  const planOrder = {trial:0, basic:1, pro:2, elite:3};
+  const required = planOrder[requiredPlan.toLowerCase()] || 2;
+  const current = planOrder[_userPlan] || 0;
+  const pages = {bot:'bot.html', ai:'ai-chat.html', portfolio:'portfolio.html'};
+  if(current >= required){ window.location.href = pages[feature] || '#'; return; }
+  const titles = {bot:'Auto Bot Terkunci', ai:'AI Advisor Terkunci', portfolio:'Portfolio Terkunci'};
+  const descs = {
+    bot:'Auto Bot AI 24/7 tersedia di paket <strong style="color:#00ff88">Pro</strong> dan <strong style="color:#00ff88">Elite</strong>.',
+    ai:'AI Advisor tersedia di paket <strong style="color:#00ff88">Pro</strong> dan <strong style="color:#00ff88">Elite</strong>.',
+    portfolio:'Portfolio tracker tersedia di paket <strong style="color:#00ff88">Pro</strong> dan <strong style="color:#00ff88">Elite</strong>.'
+  };
+  document.getElementById('popup-title').textContent = titles[feature]||'Fitur Terkunci';
+  document.getElementById('popup-desc').innerHTML = descs[feature]||'Tersedia di paket Pro dan Elite.';
+  document.getElementById('upgrade-popup').classList.add('show');
+}
+
+function updateMenuLocks(plan) {
+  const planOrder = {trial:0, basic:1, pro:2, elite:3};
+  if((planOrder[plan]||0) >= 2) {
+    ['nav-bot','nav-ai','nav-portfolio'].forEach(id => {
+      const el = document.getElementById(id);
+      if(el){ el.classList.add('unlocked'); const lk=el.querySelector('.nav-lock'); if(lk) lk.style.display='none'; }
+    });
+  }
+}
+updateMenuLocks(_userPlan);
 </script>
+<div id="upgrade-popup" onclick="closePopup()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;align-items:center;justify-content:center;">
+  <div onclick="event.stopPropagation()" style="background:#0a0f16;border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:32px 24px;text-align:center;max-width:300px;width:90%;">
+    <div style="font-size:2.5rem;margin-bottom:12px">🔒</div>
+    <h3 id="popup-title" style="color:#fff;margin-bottom:8px;font-size:1.1rem">Fitur Terkunci</h3>
+    <p id="popup-desc" style="color:#445566;font-size:0.85rem;margin-bottom:20px;line-height:1.6"></p>
+    <button onclick="window.location.href='billing.html'" style="background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.9rem;margin-bottom:10px">Upgrade Sekarang ⚡</button>
+    <button onclick="closePopup()" style="color:#334455;font-size:0.8rem;cursor:pointer;background:none;border:none">Tutup</button>
+  </div>
+</div>
