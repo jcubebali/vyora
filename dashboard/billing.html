@@ -139,6 +139,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .success-btn{margin-top:20px;background:var(--green);color:var(--black);border:none;border-radius:6px;padding:12px 28px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;letter-spacing:1px;}
 
 @media(max-width:900px){.pricing-grid{grid-template-columns:1fr;}.current-plan{flex-direction:column;gap:16px;}.pm-grid{grid-template-columns:repeat(2,1fr);}}
+
+.nav-locked{position:relative;}
+.nav-lock{margin-left:auto;font-size:0.7rem;opacity:0.6;}
+.nav-locked.unlocked .nav-lock{display:none;}
+
+/* Upgrade popup */
+#upgrade-popup{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;}
+#upgrade-popup.show{display:flex;}
+.upgrade-modal{background:#0a0f16;border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:32px 24px;text-align:center;max-width:300px;width:90%;}
+.upgrade-modal h3{color:#fff;font-size:1.1rem;margin-bottom:8px;}
+.upgrade-modal p{color:#445566;font-size:0.85rem;margin-bottom:20px;line-height:1.6;}
+.upgrade-modal-btn{background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.9rem;margin-bottom:10px;}
+.upgrade-modal-close{color:#334455;font-size:0.8rem;cursor:pointer;background:none;border:none;}
 </style>
 </head>
 <body>

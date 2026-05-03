@@ -202,6 +202,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 @media(max-width:1200px){.grid-2,.grid-3{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:768px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.stats-row{grid-template-columns:1fr 1fr;}.bot-stats{display:none;}}
+
+.nav-locked{position:relative;}
+.nav-lock{margin-left:auto;font-size:0.7rem;opacity:0.6;}
+.nav-locked.unlocked .nav-lock{display:none;}
+
+/* Upgrade popup */
+#upgrade-popup{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;}
+#upgrade-popup.show{display:flex;}
+.upgrade-modal{background:#0a0f16;border:1px solid rgba(0,255,136,0.2);border-radius:12px;padding:32px 24px;text-align:center;max-width:300px;width:90%;}
+.upgrade-modal h3{color:#fff;font-size:1.1rem;margin-bottom:8px;}
+.upgrade-modal p{color:#445566;font-size:0.85rem;margin-bottom:20px;line-height:1.6;}
+.upgrade-modal-btn{background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.9rem;margin-bottom:10px;}
+.upgrade-modal-close{color:#334455;font-size:0.8rem;cursor:pointer;background:none;border:none;}
 </style>
 </head>
 <body>
@@ -218,19 +231,22 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <span class="nav-icon">🎯</span> Sinyal Live
       <span class="nav-badge">3</span>
     </a>
-    <a href="bot.html" class="nav-item">
+    <a href="bot.html" class="nav-item nav-locked" id="nav-bot" onclick="checkAccess(event,'bot','Pro')">
       <span class="nav-icon">🤖</span> Auto Bot
+      <span class="nav-lock" id="lock-bot">🔒</span>
     </a>
     <a href="trades.html" class="nav-item">
       <span class="nav-icon">📋</span> Riwayat Trade
     </a>
 
     <div class="sidebar-section">Tools</div>
-    <a href="ai-chat.html" class="nav-item">
+    <a href="ai-chat.html" class="nav-item nav-locked" id="nav-ai" onclick="checkAccess(event,'ai','Pro')">
       <span class="nav-icon">🧠</span> AI Advisor
+      <span class="nav-lock" id="lock-ai">🔒</span>
     </a>
-    <a href="portfolio.html" class="nav-item">
+    <a href="portfolio.html" class="nav-item nav-locked" id="nav-portfolio" onclick="checkAccess(event,'portfolio','Pro')">
       <span class="nav-icon">💼</span> Portfolio
+      <span class="nav-lock" id="lock-portfolio">🔒</span>
     </a>
     <a href="alerts.html" class="nav-item">
       <span class="nav-icon">🔔</span> Price Alerts
@@ -855,6 +871,18 @@ onAuthStateChanged(auth,async(u)=>{
       renderChartFromFirestore(u.uid, '30d');
       loadOpenPositions(u.uid);
       // Baca botCycle langsung dari data Firestore
+      // Set plan untuk lock system
+      window._userPlan = d.plan || 'trial';
+      _userPlan = d.plan || 'trial';
+      // Unlock menu sesuai plan
+      const planOrder = {trial:0,basic:1,pro:2,elite:3};
+      if((planOrder[d.plan]||0) >= 2) {
+        ['nav-bot','nav-ai','nav-portfolio'].forEach(id => {
+          const el = document.getElementById(id);
+          if(el) el.classList.add('unlocked');
+        });
+      }
+
       if(d.botCycle) {
         const cyc = parseInt(d.botCycle) || 0;
         cycleCount = cyc;
