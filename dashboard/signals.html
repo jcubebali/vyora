@@ -239,6 +239,12 @@ async function loadAllSignals() {
   }
 }
 
+function formatPrice(price) {
+  if (price >= 1000) return price.toLocaleString('en', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (price >= 1) return price.toFixed(4);
+  return price.toFixed(6);
+}
+
 function renderSignals() {
   const filtered = currentFilter === 'all' ? allSignals : allSignals.filter(s => s.signal === currentFilter);
   const grid = document.getElementById('signals-grid');
@@ -271,15 +277,15 @@ function renderSignals() {
       <div class="sc-levels">
         <div class="sc-level">
           <div class="sc-level-label">Entry</div>
-          <div class="sc-level-val" style="color:var(--blue)">$${s.entry.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}</div>
+          <div class="sc-level-val" style="color:var(--blue)">$${formatPrice(s.entry)}</div>
         </div>
         <div class="sc-level">
           <div class="sc-level-label">TP +3%</div>
-          <div class="sc-level-val" style="color:var(--green)">$${s.tp.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}</div>
+          <div class="sc-level-val" style="color:var(--green)">$${formatPrice(s.tp)}</div>
         </div>
         <div class="sc-level">
           <div class="sc-level-label">SL -1.5%</div>
-          <div class="sc-level-val" style="color:var(--red)">$${s.sl.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}</div>
+          <div class="sc-level-val" style="color:var(--red)">$${formatPrice(s.sl)}</div>
         </div>
       </div>
       <div class="sc-confidence">
