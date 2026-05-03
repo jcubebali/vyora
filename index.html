@@ -97,6 +97,83 @@ nav {
 }
 .nav-cta:hover { background: var(--green2) !important; }
 
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+.nav-hamburger .bar {
+  width: 20px;
+  height: 2px;
+  background: var(--text-bright);
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center;
+}
+.nav-hamburger.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open .bar:nth-child(2) { opacity: 0; }
+.nav-hamburger.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-mobile-menu {
+  display: none;
+  position: fixed;
+  top: 61px;
+  left: 0;
+  right: 0;
+  background: rgba(2,3,5,0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 99;
+  padding: 0 20px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.3s ease;
+}
+.nav-mobile-menu.open {
+  max-height: 300px;
+  padding: 16px 20px 24px;
+}
+.nav-mobile-menu ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-mobile-menu ul a {
+  display: block;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.2s, padding-left 0.2s;
+}
+.nav-mobile-menu ul li:last-child a { border-bottom: none; }
+.nav-mobile-menu ul a:hover { color: var(--text-bright); padding-left: 8px; }
+.nav-mobile-cta {
+  display: block;
+  margin-top: 16px;
+  text-align: center;
+  background: var(--green);
+  color: var(--black) !important;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
 /* HERO */
 .hero {
   background-image: url('https://res.cloudinary.com/dbckdslrw/image/upload/v1777649388/1777648241057_eqv0pq.png');
@@ -919,6 +996,7 @@ footer {
 /* MOBILE */
 @media (max-width: 768px) {
   nav { padding: 16px 20px; }
+  .nav-hamburger { display: flex; }
   .nav-links { display: none; }
   .hero { padding: 100px 20px 60px; }
   .container { padding: 0 20px; }
@@ -958,7 +1036,21 @@ footer {
     <button onclick="setLang('en')" id="btn-en" style="background:transparent;border:1px solid #1a2535;color:#445566;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">EN</button>
   </div>
 </ul>
+  <button class="nav-hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+    <span class="bar"></span>
+    <span class="bar"></span>
+    <span class="bar"></span>
+  </button>
 </nav>
+
+<div class="nav-mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="#how" class="mobile-link">How It Works</a></li>
+    <li><a href="#features" class="mobile-link">Features</a></li>
+    <li><a href="#pricing" class="mobile-link">Pricing</a></li>
+  </ul>
+  <a href="dashboard/login.html" class="nav-mobile-cta">🚀 Mulai Gratis</a>
+</div>
 
 <!-- TICKER -->
 <div class="ticker" style="margin-top:61px">
@@ -1424,5 +1516,29 @@ function setLang(lang) {
 }
 </script>
 
+<script>
+(function(){
+  var btn=document.getElementById('hamburgerBtn');
+  var menu=document.getElementById('mobileMenu');
+  btn.addEventListener('click',function(){
+    var open=menu.classList.toggle('open');
+    btn.classList.toggle('open',open);
+    document.body.style.overflow=open?'hidden':'';
+  });
+  document.querySelectorAll('.mobile-link').forEach(function(l){
+    l.addEventListener('click',function(){
+      menu.classList.remove('open');
+      btn.classList.remove('open');
+      document.body.style.overflow='';
+    });
+  });
+  document.addEventListener('click',function(e){
+      menu.classList.remove('open');
+      btn.classList.remove('open');
+      document.body.style.overflow='';
+    }
+  });
+})();
+</script>
 </body>
 </html>
