@@ -638,31 +638,7 @@ function startBot() {
 // ── Bot Log ─────────────────────────────────────
 let cycleCount = 0;
 // Baca cycle dari Firestore realtime
-async function syncBotStatus() {
-  try {
-    const snap = await getDoc(doc(db, "users", auth.currentUser?.uid || ""));
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data.botCycle) {
-        cycleCount = parseInt(data.botCycle);
-        document.getElementById("cycles").textContent = cycleCount;
-        document.querySelector(".topbar-status").innerHTML = 
-          "<div class=\"status-dot\"></div> Bot Aktif · Cycle #" + cycleCount;
-      }
-      if (data.botLastSeen) {
-        const lastSeen = new Date(data.botLastSeen);
-        const diff = (new Date() - lastSeen) / 1000 / 60;
-        if (diff > 20) {
-          document.querySelector(".topbar-status").style.color = "var(--red)";
-          document.querySelector(".topbar-status").innerHTML = 
-            "<div style=\"width:6px;height:6px;background:var(--red);border-radius:50%\"></div> Bot Offline";
-        }
-      }
-    }
-  } catch(e) { console.error("syncBotStatus:", e); }
-}
-setInterval(syncBotStatus, 30000);
-syncBotStatus();
+// syncBotStatus handled in module script
 function addLog(msg, type='') {
   const log = document.getElementById('bot-log');
   const now = new Date().toLocaleTimeString('id');
@@ -870,6 +846,30 @@ onAuthStateChanged(auth,async(u)=>{
       window._vyoraUid = u.uid;
       renderChartFromFirestore(u.uid, '30d');
       loadOpenPositions(u.uid);
+      // Sync bot cycle dari Firestore
+      try {
+        if(d.botCycle){
+          cycleCount = parseInt(d.botCycle) || 0;
+          const cycEl = document.getElementById('cycles');
+          if(cycEl) cycEl.textContent = cycleCount;
+          const topbar = document.querySelector('.topbar-status');
+          if(topbar) topbar.innerHTML = '<div class="status-dot"></div> Bot Aktif · Cycle #' + cycleCount;
+        }
+        setInterval(async()=>{
+          try{
+            const u2 = auth.currentUser;
+            if(!u2) return;
+            const s = await getDoc(doc(db,'users',u2.uid));
+            if(s.exists()&&s.data().botCycle){
+              cycleCount=parseInt(s.data().botCycle)||0;
+              const cycEl=document.getElementById('cycles');
+              if(cycEl) cycEl.textContent=cycleCount;
+              const topbar=document.querySelector('.topbar-status');
+              if(topbar) topbar.innerHTML='<div class="status-dot"></div> Bot Aktif · Cycle #'+cycleCount;
+            }
+          }catch(e){}
+        }, 30000);
+      } catch(e){ console.error('syncBot:',e); }
       // Baca botCycle langsung dari data Firestore
       // Set plan untuk lock system
       window._userPlan = d.plan || 'trial';
