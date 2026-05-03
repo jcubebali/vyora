@@ -233,6 +233,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 <script>
 // AI responses handled by Groq AI
+// Fallback visibility setelah 3 detik
+setTimeout(() => {
+  if(document.body.style.visibility === 'hidden') {
+    document.body.style.visibility = 'visible';
+  }
+}, 3000);
 
 let isTyping = false;
 
