@@ -339,14 +339,7 @@ setInterval(() => {
 
 document.getElementById('schedule-date').textContent = new Date().toLocaleDateString('id',{weekday:'long',day:'numeric',month:'long'});
 </script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
-const auth = getAuth(app);
-onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
-window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
-</script>
+
 
 
 
@@ -355,91 +348,62 @@ window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(aut
 
 <footer style="position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:10px;font-size:0.6rem;color:#2a3a4a;letter-spacing:1.5px;text-transform:uppercase;background:rgba(2,3,5,0.95);border-top:1px solid #0f151e;z-index:9999">&copy; 2026 Vyora by J-CUBE &nbsp;|&nbsp; All Rights Reserved</footer>
 <!-- vyora-sidebar-user-fix -->
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
-const auth=getAuth(app);
-const db=getFirestore(app);
-onAuthStateChanged(auth,async(u)=>{
-  if(!u) return;
-  try {
-    const snap=await getDoc(doc(db,'users',u.uid));
-    const nm=document.getElementById('sidebar-user-name');
-    const pl=document.getElementById('sidebar-user-plan');
-    if(snap.exists()){
-      const d=snap.data();
-      if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
-      if(pl) pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
-    } else {
-      if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
-      if(pl) pl.textContent='✦ TRIAL';
-    }
-  } catch(e) {
-    const nm=document.getElementById('sidebar-user-name');
-    if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
-  }
-});
-</script>
-</body>
-</html>
+
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"nexus-trade-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
 const auth=getAuth(app);
 const db=getFirestore(app);
+
 onAuthStateChanged(auth,async(u)=>{
   if(!u){window.location.href='login.html';return;}
-  // Feature gating — cek plan
-  try {
+  try{
     const snap=await getDoc(doc(db,'users',u.uid));
     if(snap.exists()){
-      const plan=snap.data().plan||'trial';
-      const trialEndsAt=snap.data().trialEndsAt;
+      const d=snap.data();
+      const plan=d.plan||'trial';
+      const trialEndsAt=d.trialEndsAt;
       const trialExpired=trialEndsAt&&new Date(trialEndsAt)<new Date();
-      
+
       // Basic tidak bisa akses Auto Bot
       if(plan==='basic'){
         document.body.innerHTML=`
-        <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#020305;flex-direction:column;gap:20px;font-family:'DM Sans',sans-serif">
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#020305;flex-direction:column;gap:20px;font-family:'DM Sans',sans-serif;padding:20px;text-align:center">
           <div style="font-size:3rem">🔒</div>
           <div style="color:#fff;font-size:1.2rem;font-weight:700">Fitur Terkunci</div>
-          <div style="color:#445566;text-align:center;max-width:300px">Auto Bot tersedia di paket Pro dan Elite. Upgrade sekarang untuk akses bot AI trading 24/7.</div>
-          <button onclick="window.location.href='billing.html'" style="background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem">Upgrade ke Pro ⚡</button>
+          <div style="color:#445566;max-width:300px">Auto Bot tersedia di paket Pro dan Elite. Upgrade sekarang untuk akses bot AI trading 24/7.</div>
+          <button onclick="window.location.href='billing.html'" style="background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer">Upgrade ke Pro ⚡</button>
           <a href="dashboard.html" style="color:#445566;font-size:0.8rem">← Kembali ke Dashboard</a>
         </div>`;
         return;
       }
-      
-      // Trial expired tidak bisa akses
+
+      // Trial expired
       if(plan==='trial'&&trialExpired){
         document.body.innerHTML=`
-        <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#020305;flex-direction:column;gap:20px;font-family:'DM Sans',sans-serif">
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#020305;flex-direction:column;gap:20px;font-family:'DM Sans',sans-serif;padding:20px;text-align:center">
           <div style="font-size:3rem">⏰</div>
           <div style="color:#fff;font-size:1.2rem;font-weight:700">Trial Sudah Berakhir</div>
-          <div style="color:#445566;text-align:center;max-width:300px">Trial 7 hari kamu sudah habis. Pilih paket untuk melanjutkan akses.</div>
-          <button onclick="window.location.href='billing.html'" style="background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;font-size:0.9rem">Pilih Paket →</button>
+          <div style="color:#445566;max-width:300px">Trial 7 hari kamu sudah habis. Pilih paket untuk melanjutkan.</div>
+          <button onclick="window.location.href='billing.html'" style="background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer">Pilih Paket →</button>
         </div>`;
         return;
       }
     }
-  } catch(e){ console.error('Plan check error:', e); }
-  const snap=await getDoc(doc(db,'users',u.uid));
-  if(snap.exists()){
-    const d=snap.data();
-    const nm=document.getElementById('sidebar-user-name');
-    const pl=document.getElementById('sidebar-user-plan');
-    if(nm)nm.textContent=d.name||u.email;
-    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
-  }
-});
-window.doLogout=async()=>{
-  if(confirm('Yakin mau logout?')){
+  }catch(e){console.error('Auth error:',e);}
+
+  // Logout function
+  window.logoutUser=async()=>{
+    window._loggingOut=true;
     await signOut(auth);
     window.location.href='login.html';
-  }
-};
+  };
+});
 </script>
+</body>
+</html>
+
