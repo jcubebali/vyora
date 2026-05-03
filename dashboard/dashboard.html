@@ -874,6 +874,7 @@ onAuthStateChanged(auth,async(u)=>{
       // Set plan untuk lock system
       window._userPlan = d.plan || 'trial';
       _userPlan = d.plan || 'trial';
+      localStorage.setItem('vyora_plan', d.plan || 'trial');
       // Unlock menu sesuai plan
       const planOrder = {trial:0,basic:1,pro:2,elite:3};
       if((planOrder[d.plan]||0) >= 2) {
