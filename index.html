@@ -1031,16 +1031,17 @@ footer {
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="dashboard/login.html" class="nav-cta">Mulai Gratis</a></li>
   </ul>
-  <div style="display:flex;align-items:center;gap:6px;margin-left:16px">
-    <button onclick="setLang('id')" id="btn-id" style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">ID</button>
-    <button onclick="setLang('en')" id="btn-en" style="background:transparent;border:1px solid #1a2535;color:#445566;padding:4px 10px;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">EN</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div style="display:flex;gap:0">
+      <button onclick="setLang('id')" id="btn-id" style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.3);color:#00ff88;padding:4px 10px;border-radius:4px 0 0 4px;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">ID</button>
+      <button onclick="setLang('en')" id="btn-en" style="background:transparent;border:1px solid #1a2535;color:#445566;padding:4px 10px;border-radius:0 4px 4px 0;font-size:0.65rem;font-weight:700;letter-spacing:1px;cursor:pointer;font-family:DM Sans,sans-serif">EN</button>
+    </div>
+    <button class="nav-hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
   </div>
-</ul>
-  <button class="nav-hamburger" id="hamburgerBtn" aria-label="Toggle menu">
-    <span class="bar"></span>
-    <span class="bar"></span>
-    <span class="bar"></span>
-  </button>
 </nav>
 
 <div class="nav-mobile-menu" id="mobileMenu">
@@ -1051,7 +1052,6 @@ footer {
   </ul>
   <a href="dashboard/login.html" class="nav-mobile-cta">🚀 Mulai Gratis</a>
 </div>
-
 <!-- TICKER -->
 <div class="ticker" style="margin-top:61px">
   <div class="ticker-track" id="ticker">
