@@ -358,6 +358,34 @@ window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(aut
 
 
 <footer style="position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:10px;font-size:0.6rem;color:#2a3a4a;letter-spacing:1.5px;text-transform:uppercase;background:rgba(2,3,5,0.95);border-top:1px solid #0f151e;z-index:9999">&copy; 2026 Vyora by J-CUBE &nbsp;|&nbsp; All Rights Reserved</footer>
+<!-- vyora-sidebar-user-fix -->
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+onAuthStateChanged(auth,async(u)=>{
+  if(!u) return;
+  try {
+    const snap=await getDoc(doc(db,'users',u.uid));
+    const nm=document.getElementById('sidebar-user-name');
+    const pl=document.getElementById('sidebar-user-plan');
+    if(snap.exists()){
+      const d=snap.data();
+      if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
+      if(pl) pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+    } else {
+      if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
+      if(pl) pl.textContent='✦ TRIAL';
+    }
+  } catch(e) {
+    const nm=document.getElementById('sidebar-user-name');
+    if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
+  }
+});
+</script>
 </body>
 </html>
 <script type="module">
