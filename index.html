@@ -963,12 +963,9 @@ footer {
 <!-- TICKER -->
 <div class="ticker" style="margin-top:61px">
   <div class="ticker-track" id="ticker">
-    <div class="ticker-item"><span class="ticker-pair">BTC/USDT</span><span class="ticker-price" id="btc-price">$77,615</span><span class="ticker-change-up" id="btc-change">+1.89%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">ETH/USDT</span><span class="ticker-price">$3,842</span><span class="ticker-change-up">+2.14%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">BNB/USDT</span><span class="ticker-price">$618</span><span class="ticker-change-up">+0.87%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">SOL/USDT</span><span class="ticker-price">$172</span><span class="ticker-change-down">-0.43%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">XRP/USDT</span><span class="ticker-price">$2.41</span><span class="ticker-change-up">+3.21%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">DOGE/USDT</span><span class="ticker-price">$0.183</span><span class="ticker-change-up">+1.54%</span></div>
+        <div class="ticker-item"><span class="ticker-pair">SOL/USDT</span><span class="ticker-price" id="tick-SOLUSDT-p">$--</span><span id="tick-SOLUSDT-c">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">XRP/USDT</span><span class="ticker-price" id="tick-XRPUSDT-p">$--</span><span id="tick-XRPUSDT-c">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">DOGE/USDT</span><span class="ticker-price" id="tick-DOGEUSDT-p">$--</span><span id="tick-DOGEUSDT-c">--</span></div>
     <div class="ticker-item">⬥ AI SIGNAL AKTIF</div>
     <div class="ticker-item"><span class="ticker-pair">BTC/USDT</span><span class="ticker-price">$77,615</span><span class="ticker-change-up">+1.89%</span></div>
     <div class="ticker-item"><span class="ticker-pair">ETH/USDT</span><span class="ticker-price">$3,842</span><span class="ticker-change-up">+2.14%</span></div>
@@ -1320,6 +1317,36 @@ async function updateDemoSignal() {
 
 updateDemoSignal();
 setInterval(updateDemoSignal, 30000);
+
+// Live ticker update
+async function updateTicker() {
+  const pairs = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT'];
+  try {
+    const promises = pairs.map(p => 
+      fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${p}`)
+      .then(r => r.json())
+    );
+    const results = await Promise.all(promises);
+    results.forEach(d => {
+      const price = parseFloat(d.lastPrice);
+      const change = parseFloat(d.priceChangePercent);
+      const priceEl = document.getElementById(`tick-${d.symbol}-p`);
+      const changeEl = document.getElementById(`tick-${d.symbol}-c`);
+      if(priceEl) {
+        if(price >= 1000) priceEl.textContent = '$' + price.toLocaleString('en', {minimumFractionDigits:2, maximumFractionDigits:2});
+        else if(price >= 1) priceEl.textContent = '$' + price.toFixed(4);
+        else priceEl.textContent = '$' + price.toFixed(6);
+      }
+      if(changeEl) {
+        changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+        changeEl.className = change >= 0 ? 'ticker-change-up' : 'ticker-change-down';
+      }
+    });
+  } catch(e) { console.error('Ticker error:', e); }
+}
+
+updateTicker();
+setInterval(updateTicker, 30000);
 
 // Scroll reveal
 const observer = new IntersectionObserver((entries) => {
