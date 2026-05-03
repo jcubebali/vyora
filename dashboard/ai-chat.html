@@ -118,7 +118,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .qc-desc{font-size:0.72rem;color:var(--text-dim);}
 </style>
 </head>
-<body>
+<body style="visibility:hidden">
 <div class="sidebar">
   <div class="sidebar-logo">VYORA<span>.</span></div>
   <nav class="sidebar-nav">
@@ -401,57 +401,64 @@ setInterval(updateLivePrice, 30000);
 
 <footer style="position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:10px;font-size:0.6rem;color:#2a3a4a;letter-spacing:1.5px;text-transform:uppercase;background:rgba(2,3,5,0.95);border-top:1px solid #0f151e;z-index:9999">&copy; 2026 Vyora by J-CUBE &nbsp;|&nbsp; All Rights Reserved</footer>
 <!-- vyora-sidebar-user-fix -->
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
-const auth=getAuth(app);
-const db=getFirestore(app);
-onAuthStateChanged(auth,async(u)=>{
-  if(!u) return;
-  try {
-    const snap=await getDoc(doc(db,'users',u.uid));
-    const nm=document.getElementById('sidebar-user-name');
-    const pl=document.getElementById('sidebar-user-plan');
-    if(snap.exists()){
-      const d=snap.data();
-      if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
-      if(pl) pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
-    } else {
-      if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
-      if(pl) pl.textContent='✦ TRIAL';
-    }
-  } catch(e) {
-    const nm=document.getElementById('sidebar-user-name');
-    if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
-  }
-});
-</script>
-</body>
-</html>
+
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"nexus-trade-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
 const auth=getAuth(app);
 const db=getFirestore(app);
+
+const LOCK_SCREEN = (title, desc, btn_text='Upgrade ke Pro ⚡') => `
+<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%;background:#020305;flex-direction:column;gap:20px;font-family:'DM Sans',sans-serif;padding:20px;text-align:center;position:fixed;top:0;left:0;z-index:9999">
+  <div style="font-size:4rem">🔒</div>
+  <div style="color:#fff;font-size:1.4rem;font-weight:700;letter-spacing:1px">${title}</div>
+  <div style="color:#445566;max-width:280px;line-height:1.6;font-size:0.9rem">${desc}</div>
+  <button onclick="window.location.href='billing.html'" style="background:#00ff88;color:#000;border:none;padding:14px 28px;border-radius:8px;font-weight:700;cursor:pointer;font-size:1rem;margin-top:8px">${btn_text}</button>
+  <a href="dashboard.html" style="color:#334455;font-size:0.8rem;margin-top:4px">← Kembali ke Dashboard</a>
+</div>`;
+
 onAuthStateChanged(auth,async(u)=>{
   if(!u){window.location.href='login.html';return;}
-  const snap=await getDoc(doc(db,'users',u.uid));
-  if(snap.exists()){
-    const d=snap.data();
-    const nm=document.getElementById('sidebar-user-name');
-    const pl=document.getElementById('sidebar-user-plan');
-    if(nm)nm.textContent=d.name||u.email;
-    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+  try{
+    const snap=await getDoc(doc(db,'users',u.uid));
+    if(snap.exists()){
+      const d=snap.data();
+      const plan=d.plan||'trial';
+      const trialExpired=d.trialEndsAt&&new Date(d.trialEndsAt)<new Date();
+
+      if(plan==='basic'){
+        document.body.innerHTML=LOCK_SCREEN(
+          'FITUR TERKUNCI',
+          'AI Advisor tersedia di paket Pro dan Elite. Upgrade untuk akses AI trading advisor 24/7.'
+        );
+        return;
+      }
+      if(plan==='trial'&&trialExpired){
+        document.body.innerHTML=LOCK_SCREEN(
+          'TRIAL SUDAH BERAKHIR',
+          'Trial 7 hari kamu sudah habis. Pilih paket untuk melanjutkan.',
+          'Pilih Paket →'
+        );
+        return;
+      }
+    }
+    document.body.style.visibility='visible';
+  }catch(e){
+    document.body.style.visibility='visible';
+    console.error('Auth error:',e);
   }
-});
-window.doLogout=async()=>{
-  if(confirm('Yakin mau logout?')){
+
+  window.logoutUser=async()=>{
+    window._loggingOut=true;
     await signOut(auth);
     window.location.href='login.html';
-  }
-};
+  };
+});
 </script>
+</body>
+</html>
+
