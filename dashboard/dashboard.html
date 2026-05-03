@@ -307,8 +307,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       </div>
       <div class="stat-card stat-gold">
         <div class="stat-label">Win Rate</div>
-        <div class="stat-value" style="color:var(--gold)">100%</div>
-        <div class="stat-sub">1 Win · 0 Loss (total 1 trade)</div>
+        <div class="stat-value" style="color:var(--gold)" id="win-rate-val">--%</div>
+        <div class="stat-sub" id="win-rate-sub">Loading...</div>
       </div>
       <div class="stat-card stat-red">
         <div class="stat-label">Posisi Terbuka</div>
@@ -869,6 +869,15 @@ onAuthStateChanged(auth,async(u)=>{
       const bv=document.getElementById('balance-val');
       if(pb)pb.textContent='$'+(d.totalPnl||0).toFixed(4);
       if(bv)bv.textContent='$'+(d.totalUsdt||0).toFixed(2);
+      // Update Win Rate dari Firestore
+      const wr = document.getElementById('win-rate-val');
+      const wrs = document.getElementById('win-rate-sub');
+      const totalTrades = d.totalTrades || 0;
+      const winRate = d.winRate || 0;
+      const wins = Math.round(totalTrades * winRate / 100);
+      const losses = totalTrades - wins;
+      if(wr) wr.textContent = winRate.toFixed(0) + '%';
+      if(wrs) wrs.textContent = wins + ' Win · ' + losses + ' Loss (total ' + totalTrades + ' trade)';
     // Update plan banner
     if(d.plan==='trial'&&d.trialEndsAt){
       const ends=d.trialEndsAt.toDate?d.trialEndsAt.toDate():new Date(d.trialEndsAt);
