@@ -1093,7 +1093,7 @@ window._loggingOut=false;}
 let _userPlan = localStorage.getItem('vyora_plan') || 'trial';
 
 function closePopup() {
-  document.getElementById('upgrade-popup').classList.remove('show');
+  document.getElementById('upgrade-popup').style.display = 'none';
 }
 
 function checkAccess(e, feature, requiredPlan) {
@@ -1112,7 +1112,7 @@ function checkAccess(e, feature, requiredPlan) {
   };
   document.getElementById('popup-title').textContent = titles[feature]||'Fitur Terkunci';
   document.getElementById('popup-desc').innerHTML = descs[feature]||'Tersedia di paket Pro dan Elite.';
-  document.getElementById('upgrade-popup').classList.add('show');
+  document.getElementById('upgrade-popup').style.display = 'flex';
 }
 
 function updateMenuLocks(plan) {
