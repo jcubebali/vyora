@@ -281,16 +281,16 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="content">
 
     <!-- PLAN BANNER -->
-    <div class="plan-banner">
+    <div class="plan-banner" id="trial-banner">
       <div class="plan-info">
-        <h3>🎁 FREE TRIAL AKTIF</h3>
-        <p>Nikmati semua fitur Premium selama trial. Upgrade sekarang untuk akses penuh tanpa batas.</p>
+        <h3 id="trial-title">🎁 FREE TRIAL AKTIF</h3>
+        <p id="trial-desc">Nikmati semua fitur Premium selama trial. Upgrade sekarang untuk akses penuh tanpa batas.</p>
       </div>
       <div>
         <div class="plan-days" id="trial-days">6</div>
-        <div class="plan-days-label">Hari tersisa</div>
+        <div class="plan-days-label" id="trial-days-label">Hari tersisa</div>
       </div>
-      <button class="upgrade-btn" onclick="window.location.href='billing.html'">Upgrade ke Pro →</button>
+      <button class="upgrade-btn" id="trial-btn" onclick="window.location.href='billing.html'">Upgrade ke Pro →</button>
     </div>
 
     <!-- STATS -->
@@ -878,12 +878,39 @@ onAuthStateChanged(auth,async(u)=>{
       const losses = totalTrades - wins;
       if(wr) wr.textContent = winRate.toFixed(0) + '%';
       if(wrs) wrs.textContent = wins + ' Win · ' + losses + ' Loss (total ' + totalTrades + ' trade)';
-    // Update plan banner
-    if(d.plan==='trial'&&d.trialEndsAt){
-      const ends=d.trialEndsAt.toDate?d.trialEndsAt.toDate():new Date(d.trialEndsAt);
-      const days=Math.max(0,Math.ceil((ends-new Date())/(864e5)));
-      const td=document.getElementById('trial-days');
-      if(td)td.textContent=days;
+    // Banner berdasarkan plan
+    const trialBanner = document.getElementById('trial-banner');
+    const plan = d.plan || 'trial';
+    if(plan === 'trial') {
+      if(trialBanner) trialBanner.style.display = 'flex';
+      if(d.trialEndsAt){
+        const ends = new Date(d.trialEndsAt);
+        const days = Math.max(0, Math.ceil((ends-new Date())/(864e5)));
+        const td = document.getElementById('trial-days');
+        if(td) td.textContent = days;
+      }
+    } else if(plan === 'basic') {
+      if(trialBanner){
+        trialBanner.style.background = 'rgba(14,165,233,0.08)';
+        trialBanner.style.borderColor = 'rgba(14,165,233,0.2)';
+        document.getElementById('trial-title').textContent = '⚡ PAKET BASIC AKTIF';
+        document.getElementById('trial-desc').textContent = 'Kamu menggunakan paket Basic. Upgrade ke Pro untuk akses auto trading bot AI 24/7.';
+        document.getElementById('trial-days').textContent = '';
+        document.getElementById('trial-days-label').textContent = '';
+        document.getElementById('trial-btn').textContent = 'Upgrade ke Pro →';
+      }
+    } else if(plan === 'pro') {
+      if(trialBanner){
+        trialBanner.style.background = 'rgba(0,255,136,0.05)';
+        trialBanner.style.borderColor = 'rgba(0,255,136,0.15)';
+        document.getElementById('trial-title').textContent = '🚀 PAKET PRO AKTIF';
+        document.getElementById('trial-desc').textContent = 'Bot AI trading 24/7 aktif. Upgrade ke Elite untuk Futures bot dan WhatsApp notifikasi.';
+        document.getElementById('trial-days').textContent = '';
+        document.getElementById('trial-days-label').textContent = '';
+        document.getElementById('trial-btn').textContent = 'Upgrade ke Elite →';
+      }
+    } else if(plan === 'elite') {
+      if(trialBanner) trialBanner.style.display = 'none';
     }
     }
   }catch(e){console.error("Firestore error:",e);}
