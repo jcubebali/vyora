@@ -963,18 +963,16 @@ footer {
 <!-- TICKER -->
 <div class="ticker" style="margin-top:61px">
   <div class="ticker-track" id="ticker">
-        <div class="ticker-item"><span class="ticker-pair">SOL/USDT</span><span class="ticker-price" id="tick-SOLUSDT-p">$--</span><span id="tick-SOLUSDT-c">--</span></div>
-    <div class="ticker-item"><span class="ticker-pair">XRP/USDT</span><span class="ticker-price" id="tick-XRPUSDT-p">$--</span><span id="tick-XRPUSDT-c">--</span></div>
-    <div class="ticker-item"><span class="ticker-pair">DOGE/USDT</span><span class="ticker-price" id="tick-DOGEUSDT-p">$--</span><span id="tick-DOGEUSDT-c">--</span></div>
-    <div class="ticker-item">⬥ AI SIGNAL AKTIF</div>
-    <div class="ticker-item"><span class="ticker-pair">BTC/USDT</span><span class="ticker-price">$77,615</span><span class="ticker-change-up">+1.89%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">ETH/USDT</span><span class="ticker-price">$3,842</span><span class="ticker-change-up">+2.14%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">BNB/USDT</span><span class="ticker-price">$618</span><span class="ticker-change-up">+0.87%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">SOL/USDT</span><span class="ticker-price">$172</span><span class="ticker-change-down">-0.43%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">XRP/USDT</span><span class="ticker-price">$2.41</span><span class="ticker-change-up">+3.21%</span></div>
-    <div class="ticker-item"><span class="ticker-pair">DOGE/USDT</span><span class="ticker-price">$0.183</span><span class="ticker-change-up">+1.54%</span></div>
-    <div class="ticker-item">⬥ AI SIGNAL AKTIF</div>
+    <div class="ticker-item"><span class="ticker-pair">BTC/USDT</span><span class="ticker-price" id="tick-BTCUSDT-p">$--</span><span id="tick-BTCUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">ETH/USDT</span><span class="ticker-price" id="tick-ETHUSDT-p">$--</span><span id="tick-ETHUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">BNB/USDT</span><span class="ticker-price" id="tick-BNBUSDT-p">$--</span><span id="tick-BNBUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">SOL/USDT</span><span class="ticker-price" id="tick-SOLUSDT-p">$--</span><span id="tick-SOLUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">XRP/USDT</span><span class="ticker-price" id="tick-XRPUSDT-p">$--</span><span id="tick-XRPUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">DOGE/USDT</span><span class="ticker-price" id="tick-DOGEUSDT-p">$--</span><span id="tick-DOGEUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">ADA/USDT</span><span class="ticker-price" id="tick-ADAUSDT-p">$--</span><span id="tick-ADAUSDT-c" class="ticker-change-up">--</span></div>
+    <div class="ticker-item"><span class="ticker-pair">AVAX/USDT</span><span class="ticker-price" id="tick-AVAXUSDT-p">$--</span><span id="tick-AVAXUSDT-c" class="ticker-change-up">--</span></div>
   </div>
+</div>
 </div>
 
 <!-- HERO -->
@@ -1320,7 +1318,7 @@ setInterval(updateDemoSignal, 30000);
 
 // Live ticker update
 async function updateTicker() {
-  const pairs = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT'];
+  const pairs = ['BTCUSDT','ETHUSDT','BNBUSDT','SOLUSDT','XRPUSDT','DOGEUSDT','ADAUSDT','AVAXUSDT'];
   try {
     const promises = pairs.map(p => 
       fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${p}`)
