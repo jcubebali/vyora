@@ -201,7 +201,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .upgrade-btn{background:var(--green);color:var(--black);border:none;border-radius:6px;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;letter-spacing:1px;}
 
 @media(max-width:1200px){.grid-2,.grid-3{grid-template-columns:1fr;}.stats-row{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:768px){.sidebar{transform:translateX(-100%);}.main{margin-left:0;}.stats-row{grid-template-columns:1fr 1fr;}.bot-stats{display:none;}}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .bot-stats{display:none;}
+  .hamburger{display:flex;}
+  .sidebar-overlay{display:block;}
+  .topbar{padding:0 12px;}
+}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none;z-index:20;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text-bright);border-radius:2px;transition:all 0.3s;}
+.sidebar-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9;}
 
 .nav-locked{position:relative;}
 .nav-lock{margin-left:auto;font-size:0.7rem;opacity:0.6;}
@@ -275,10 +287,14 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 </div>
 
 <!-- MAIN -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="main">
 
   <!-- TOPBAR -->
   <div class="topbar">
+      <button onclick="toggleNotifications()" class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     <div class="topbar-left">
       <div class="page-title">DASHBOARD</div>
       <div class="topbar-status">
@@ -287,8 +303,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       </div>
     </div>
     <div class="topbar-right">
-      <button class="topbar-btn">📥 Export</button>
-      <button class="topbar-btn">🔔 <span id="notif-count">3</span></button>
+      <button onclick="toggleNotifications()" class="topbar-btn">📥 Export</button>
+      <button onclick="toggleNotifications()" class="topbar-btn">🔔 <span id="notif-count">3</span></button>
       <button class="topbar-btn primary" onclick="window.location.href='billing.html'">⬆ Upgrade Pro</button>
     </div>
   </div>
@@ -1088,6 +1104,32 @@ async function loadTradeHistory(uid) {
 window._loggingOut=false;}
 };
 
+
+// ── Mobile Sidebar Toggle ────────────────────────
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+}
+
+// ── Notifikasi Bell ──────────────────────────────
+function toggleNotifications() {
+  const existing = document.getElementById('notif-panel');
+  if(existing) { existing.remove(); return; }
+  
+  const panel = document.createElement('div');
+  panel.id = 'notif-panel';
+  panel.style.cssText = 'position:fixed;top:60px;right:16px;width:280px;background:#0a0f16;border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:16px;z-index:9999;';
+  panel.innerHTML = `
+    <div style="font-size:0.75rem;font-weight:700;color:var(--text-bright);margin-bottom:12px;letter-spacing:1px">🔔 NOTIFIKASI</div>
+    <div style="font-size:0.78rem;color:#445566;text-align:center;padding:20px 0">Belum ada notifikasi baru</div>
+    <div style="font-size:0.65rem;color:#334455;text-align:center;margin-top:8px">Notifikasi akan muncul saat TP/SL hit</div>
+  `;
+  document.body.appendChild(panel);
+  setTimeout(() => { document.addEventListener('click', function handler(e) {
+    if(!panel.contains(e.target)) { panel.remove(); document.removeEventListener('click', handler); }
+  }); }, 100);
+}
 
 // ── Lock System ──────────────────────────────────
 let _userPlan = localStorage.getItem('vyora_plan') || 'trial';
