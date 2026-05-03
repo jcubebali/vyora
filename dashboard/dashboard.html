@@ -292,7 +292,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
   <!-- TOPBAR -->
   <div class="topbar">
-      <button onclick="toggleNotifications()" class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
     <div class="topbar-left">
@@ -303,7 +303,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       </div>
     </div>
     <div class="topbar-right">
-      <button onclick="toggleNotifications()" class="topbar-btn">📥 Export</button>
+      <button onclick="exportTrades()" class="topbar-btn">📥 Export</button>
       <button onclick="toggleNotifications()" class="topbar-btn">🔔 <span id="notif-count">3</span></button>
       <button class="topbar-btn primary" onclick="window.location.href='billing.html'">⬆ Upgrade Pro</button>
     </div>
