@@ -177,6 +177,10 @@ const trades = [];
 
 let filtered = [...trades];
 
+function updateFiltered(type='all') {
+  filtered = type==='all' ? [...trades] : trades.filter(t=>t.action===type);
+}
+
 function filterTrades(type, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -193,15 +197,16 @@ function renderTrades() {
   body.innerHTML = filtered.map(t => {
     const badgeClass = t.action==='BUY' ? 'badge-buy' : t.action==='SELL_TP' ? 'badge-tp' : 'badge-sl';
     const badgeText = t.action==='BUY' ? 'BUY' : t.action==='SELL_TP' ? 'SELL TP' : 'SELL SL';
-    const pnlText = t.pnl ? `<span style="color:${t.pnl>0?'var(--green)':'var(--red)'}">${t.pnl>0?'+':''}$${t.pnl.toFixed(4)}</span>` : '<span style="color:var(--text-dim)">—</span>';
+    const pnlNum = parseFloat((t.pnl||'0').replace('$','').replace('+',''));
+    const pnlText = t.pnl ? `<span style="color:${pnlNum>=0?'var(--green)':'var(--red)'}">${pnlNum>=0?'+':''}${t.pnl}</span>` : '<span style="color:var(--text-dim)">—</span>';
     const statusColor = t.status==='WIN' ? 'var(--green)' : t.status==='LOSS' ? 'var(--red)' : 'var(--text-dim)';
     return `
     <div class="table-row">
       <div class="td-time">${t.time}</div>
       <div><span class="badge ${badgeClass}">${badgeText}</span></div>
       <div class="td-pair">${t.pair}</div>
-      <div class="td-price">$${t.entry.toLocaleString('en',{minimumFractionDigits:2})}</div>
-      <div class="td-price">${t.exit ? '$'+t.exit.toLocaleString('en',{minimumFractionDigits:2}) : '—'}</div>
+      <div class="td-price">${t.entry}</div>
+      <div class="td-price">${t.exit || '—'}</div>
       <div class="td-price">${t.qty}</div>
       <div class="td-pnl">${pnlText}</div>
       <div style="font-size:0.7rem;color:${statusColor};font-weight:700">${t.status}</div>
@@ -298,8 +303,9 @@ onAuthStateChanged(auth,async(u)=>{
     if(els[2]) els[2].textContent=losses;
     if(els[3]) els[3].textContent=wr+'%';
     if(els[4]) els[4].textContent=(totalPnl>=0?'+':'')+'$'+totalPnl.toFixed(4);
+    filtered = [...trades];
     renderTrades();
-  }catch(e){console.error('Trades error:',e);renderTrades();}
+  }catch(e){console.error('Trades error:',e);filtered=[...trades];renderTrades();}
 
   // Logout
   window.logoutUser=async()=>{
