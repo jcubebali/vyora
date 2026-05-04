@@ -218,7 +218,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   .topbar-btn span{display:none;}
 }
 
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99;}
+.sidebar-overlay{display:none;position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:50;cursor:pointer;}
 .sidebar-overlay.open{display:block;}
 
 .nav-locked{position:relative;}
@@ -305,7 +305,7 @@ function toggleSidebar(){
 </div>
 
 <!-- MAIN -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()" style="cursor:pointer;"></div></div>
 <div class="main">
 
   <!-- TOPBAR -->
