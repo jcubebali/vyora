@@ -204,13 +204,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none;z-index:20;}
 .hamburger span{display:block;width:22px;height:2px;background:var(--text-bright);border-radius:2px;transition:all 0.3s;}
 @media(max-width:768px){
-  .sidebar{transform:translateX(-100%);}
+  .sidebar{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);transition:transform 0.3s ease;z-index:100;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;}
   .stats-row{grid-template-columns:1fr 1fr;}
   .bot-stats{display:none;}
   .hamburger{display:flex;}
-  .sidebar-overlay{display:block;}
   .topbar{padding:0 12px;}
 }
 
