@@ -230,14 +230,7 @@ function renderChart() {
 renderTrades();
 renderChart();
 </script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
-const auth = getAuth(app);
-onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
-window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
-</script>
+
 
 
 
@@ -246,96 +239,73 @@ window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(aut
 
 <footer style="position:fixed;bottom:0;left:0;width:100%;text-align:center;padding:10px;font-size:0.6rem;color:#2a3a4a;letter-spacing:1.5px;text-transform:uppercase;background:rgba(2,3,5,0.95);border-top:1px solid #0f151e;z-index:9999">&copy; 2026 Vyora by J-CUBE &nbsp;|&nbsp; All Rights Reserved</footer>
 <!-- vyora-sidebar-user-fix -->
-<script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
-const auth=getAuth(app);
-const db=getFirestore(app);
-onAuthStateChanged(auth,async(u)=>{
-  if(!u) return;
-  
-  // Load trades dari Firestore
-  try {
-    const q = query(
-      collection(db,'trades'),
-      where('uid','==',u.uid),
-      orderBy('timestamp','desc'),
-      limit(100)
-    );
-    const tSnap = await getDocs(q);
-    tSnap.forEach(d => {
-      const t = d.data();
-      const pnl = parseFloat(t.pnlUsdt || 0);
-      const pnlPct = parseFloat(t.pnlPct || 0);
-      trades.push({
-        time: t.timestamp ? new Date(t.timestamp).toLocaleString('id-ID') : '--',
-        action: pnl >= 0 ? 'WIN' : 'LOSS',
-        pair: t.symbol || 'BTCUSDT',
-        entry: '$' + parseFloat(t.entryPrice||0).toLocaleString('en',{minimumFractionDigits:2}),
-        exit: '$' + parseFloat(t.exitPrice||0).toLocaleString('en',{minimumFractionDigits:2}),
-        qty: t.quantity || 0,
-        pnl: (pnl>=0?'+':'')+'$'+pnl.toFixed(4),
-        pnlPct: (pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%',
-        status: t.status || 'CLOSED'
-      });
-    });
-    const wins = trades.filter(t=>t.action==='WIN').length;
-    const losses = trades.filter(t=>t.action==='LOSS').length;
-    const totalPnl = trades.reduce((s,t)=>s+parseFloat(t.pnl.replace('$','').replace('+','')),0);
-    const wr = trades.length>0?(wins/trades.length*100).toFixed(0):0;
-    const els = document.querySelectorAll('.sum-value');
-    if(els[0]) els[0].textContent = trades.length;
-    if(els[1]) els[1].textContent = wins;
-    if(els[2]) els[2].textContent = losses;
-    if(els[3]) els[3].textContent = wr+'%';
-    if(els[4]) els[4].textContent = (totalPnl>=0?'+':'')+'$'+totalPnl.toFixed(4);
-    renderTrades();
-  } catch(e) { console.error('Load trades:', e); renderTrades(); }
 
-  try {
-    const snap=await getDoc(doc(db,'users',u.uid));
-    const nm=document.getElementById('sidebar-user-name');
-    const pl=document.getElementById('sidebar-user-plan');
-    if(snap.exists()){
-      const d=snap.data();
-      if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
-      if(pl) pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
-    } else {
-      if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
-      if(pl) pl.textContent='✦ TRIAL';
-    }
-  } catch(e) {
-    const nm=document.getElementById('sidebar-user-name');
-    if(nm) nm.textContent=u.displayName||u.email.split('@')[0];
-  }
-});
-</script>
 </body>
 </html>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
+
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
 const auth=getAuth(app);
 const db=getFirestore(app);
+
 onAuthStateChanged(auth,async(u)=>{
-  if(!u){window.location.href='login.html';return;}
-  const snap=await getDoc(doc(db,'users',u.uid));
-  if(snap.exists()){
-    const d=snap.data();
-    const nm=document.getElementById('sidebar-user-name');
-    const pl=document.getElementById('sidebar-user-plan');
-    if(nm)nm.textContent=d.name||u.email;
-    if(pl)pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
-  }
-});
-window.doLogout=async()=>{
-  if(confirm('Yakin mau logout?')){
+  if(!u){window.location.replace('login.html');return;}
+  
+  // Load user info
+  try{
+    const snap=await getDoc(doc(db,'users',u.uid));
+    if(snap.exists()){
+      const d=snap.data();
+      const nm=document.getElementById('sidebar-user-name');
+      const pl=document.getElementById('sidebar-user-plan');
+      if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
+      if(pl) pl.textContent='✦ '+(d.plan||'trial').toUpperCase();
+    }
+  }catch(e){}
+
+  // Load trades
+  try{
+    const q=query(collection(db,'trades'),where('uid','==',u.uid),orderBy('timestamp','desc'),limit(100));
+    const tSnap=await getDocs(q);
+    tSnap.forEach(d=>{
+      const t=d.data();
+      const pnl=parseFloat(t.pnlUsdt||0);
+      const pnlPct=parseFloat(t.pnlPct||0);
+      trades.push({
+        time:t.timestamp?new Date(t.timestamp).toLocaleString('id-ID'):'--',
+        action:pnl>=0?'WIN':'LOSS',
+        pair:t.symbol||'BTCUSDT',
+        entry:'$'+parseFloat(t.entryPrice||0).toLocaleString('en',{minimumFractionDigits:2}),
+        exit:'$'+parseFloat(t.exitPrice||0).toLocaleString('en',{minimumFractionDigits:2}),
+        qty:t.quantity||0,
+        pnl:(pnl>=0?'+':'')+'$'+pnl.toFixed(4),
+        pnlPct:(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%',
+        status:t.status||'CLOSED'
+      });
+    });
+    
+    const wins=trades.filter(t=>t.action==='WIN').length;
+    const losses=trades.filter(t=>t.action==='LOSS').length;
+    const totalPnl=trades.reduce((s,t)=>s+parseFloat(t.pnl.replace('$','').replace('+','')),0);
+    const wr=trades.length>0?(wins/trades.length*100).toFixed(0):0;
+    const els=document.querySelectorAll('.sum-value');
+    if(els[0]) els[0].textContent=trades.length;
+    if(els[1]) els[1].textContent=wins;
+    if(els[2]) els[2].textContent=losses;
+    if(els[3]) els[3].textContent=wr+'%';
+    if(els[4]) els[4].textContent=(totalPnl>=0?'+':'')+'$'+totalPnl.toFixed(4);
+    renderTrades();
+  }catch(e){console.error('Trades error:',e);renderTrades();}
+
+  // Logout
+  window.logoutUser=async()=>{
+    window._loggingOut=true;
     await signOut(auth);
     window.location.href='login.html';
-  }
-};
+  };
+});
 </script>
