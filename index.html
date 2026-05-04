@@ -1540,98 +1540,154 @@ function setLang(lang) {
   });
 })();
 </script>
-
+<!-- ANIMATED BG -->
 <canvas id="lineC" style="position:fixed;inset:0;width:100%;height:100%;z-index:10;pointer-events:none;"></canvas>
-<canvas id="dotC"  style="position:fixed;inset:0;width:100%;height:100%;z-index:11;pointer-events:none;"></canvas>
+<canvas id="dotC" style="position:fixed;inset:0;width:100%;height:100%;z-index:11;pointer-events:none;"></canvas>
 <script>
 (function(){
-const lineC=document.getElementById('lineC'),dotC=document.getElementById('dotC');
-const lctx=lineC.getContext('2d'),dctx=dotC.getContext('2d');
-let W,H,DPR;
+var lineC=document.getElementById('lineC');
+var dotC=document.getElementById('dotC');
+var lctx=lineC.getContext('2d');
+var dctx=dotC.getContext('2d');
+var W,H,DPR;
 function resize(){
-  DPR=devicePixelRatio;
-  W=lineC.width=dotC.width=window.innerWidth*DPR;
-  H=lineC.height=dotC.height=window.innerHeight*DPR;
+  DPR=window.devicePixelRatio||1;
+  W=window.innerWidth*DPR;
+  H=window.innerHeight*DPR;
+  lineC.width=dotC.width=W;
+  lineC.height=dotC.height=H;
   lineC.style.width=dotC.style.width=window.innerWidth+'px';
   lineC.style.height=dotC.style.height=window.innerHeight+'px';
 }
 resize();
-window.addEventListener('resize',()=>{resize();init();});
-const SEGMENT_CONFIGS=[
+window.addEventListener('resize',function(){resize();init();});
+var CONFIGS=[
   {upBias:0.72,segments:18,volatility:0.5},
   {upBias:0.80,segments:14,volatility:0.3},
   {upBias:0.65,segments:22,volatility:0.8},
-  {upBias:0.75,segments:16,volatility:0.6},
+  {upBias:0.75,segments:16,volatility:0.6}
 ];
-let patternQueue=0;
+var patIdx=0;
 function makePoints(cfg){
-  const{upBias,segments,volatility}=cfg;
-  const pts=[];
-  const startY=H*0.85,endY=H*0.10,totalRise=startY-endY;
-  const upCount=Math.round(segments*upBias),downCount=segments-upCount;
-  const segArr=[];
-  for(let i=0;i<upCount;i++)segArr.push('up');
-  for(let i=0;i<downCount;i++)segArr.push('down');
-  for(let i=segArr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[segArr[i],segArr[j]]=[segArr[j],segArr[i]];}
-  const upMag=totalRise/Math.max(0.1,upCount-volatility*downCount);
-  const downMag=upMag*volatility;
-  const segLengths=segArr.map(()=>0.5+Math.random()*1.5);
-  const totalLen=segLengths.reduce((a,b)=>a+b,0);
-  const scaledLens=segLengths.map(l=>(l/totalLen)*W);
-  let x=0,y=startY;
-  pts.push({x,y});
-  segArr.forEach((dir,i)=>{x+=scaledLens[i];y+=dir==='up'?-upMag:downMag;y=Math.max(H*0.06,Math.min(H*0.92,y));pts.push({x,y});});
+  var pts=[];
+  var startY=H*0.85;
+  var endY=H*0.10;
+  var totalRise=startY-endY;
+  var upCount=Math.round(cfg.segments*cfg.upBias);
+  var downCount=cfg.segments-upCount;
+  var segArr=[];
+  var i;
+  for(i=0;i<upCount;i++) segArr.push(1);
+  for(i=0;i<downCount;i++) segArr.push(-1);
+  for(i=segArr.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var tmp=segArr[i];segArr[i]=segArr[j];segArr[j]=tmp;
+  }
+  var upMag=totalRise/Math.max(0.1,upCount-cfg.volatility*downCount);
+  var downMag=upMag*cfg.volatility;
+  var segLens=segArr.map(function(){return 0.5+Math.random()*1.5;});
+  var totalLen=segLens.reduce(function(a,b){return a+b;},0);
+  var scaledLens=segLens.map(function(l){return (l/totalLen)*W;});
+  var x=0,y=startY;
+  pts.push({x:x,y:y});
+  for(i=0;i<segArr.length;i++){
+    x+=scaledLens[i];
+    y+=segArr[i]===1?-upMag:downMag;
+    y=Math.max(H*0.06,Math.min(H*0.92,y));
+    pts.push({x:x,y:y});
+  }
   return pts;
 }
-let lines=[],tick=0,sub=0;
+var lines=[];
+var tick=0;
+var sub=0;
 function spawnLine(){
-  const cfg=SEGMENT_CONFIGS[patternQueue%SEGMENT_CONFIGS.length];patternQueue++;
-  const pts=makePoints(cfg);
-  lines.push({pts,drawIdx:0,done:false});
-  if(lines.length>4)lines.shift();
+  var cfg=CONFIGS[patIdx%CONFIGS.length];
+  patIdx++;
+  var pts=makePoints(cfg);
+  lines.push({pts:pts,drawIdx:0,done:false});
+  if(lines.length>4) lines.shift();
 }
-function init(){lctx.clearRect(0,0,W,H);dctx.clearRect(0,0,W,H);lines=[];patternQueue=0;tick=0;sub=0;spawnLine();}
+function init(){
+  lctx.clearRect(0,0,W,H);
+  dctx.clearRect(0,0,W,H);
+  lines=[];patIdx=0;tick=0;sub=0;
+  spawnLine();
+}
 init();
-const SPEED=0.03;
+var SPEED=0.03;
 function drawLines(){
   lctx.clearRect(0,0,W,H);
-  lctx.fillStyle='#020305';lctx.fillRect(0,0,W,H);
-  const SIZE=48*DPR;
-  lctx.lineWidth=0.8;lctx.strokeStyle='#2a2a2a';
-  for(let x=0;x<=W;x+=SIZE){lctx.beginPath();lctx.moveTo(x,0);lctx.lineTo(x,H);lctx.stroke();}
-  for(let y=0;y<=H;y+=SIZE){lctx.beginPath();lctx.moveTo(0,y);lctx.lineTo(W,y);lctx.stroke();}
-  lctx.strokeStyle='#3a3a3a';lctx.lineWidth=1.2;
-  for(let x=0;x<=W;x+=SIZE*5){lctx.beginPath();lctx.moveTo(x,0);lctx.lineTo(x,H);lctx.stroke();}
-  for(let y=0;y<=H;y+=SIZE*5){lctx.beginPath();lctx.moveTo(0,y);lctx.lineTo(W,y);lctx.stroke();}
-  lines.forEach((line,li)=>{
-    const total=lines.length,isNewest=li===total-1;
-    const alpha=isNewest?0.88:0.08+(li/(total-1))*0.35;
-    if(line.drawIdx<1)return;
-    lctx.beginPath();lctx.moveTo(line.pts[0].x,line.pts[0].y);
-    for(let i=1;i<=line.drawIdx&&i<line.pts.length;i++)lctx.lineTo(line.pts[i].x,line.pts[i].y);
-    lctx.strokeStyle='rgba(0,255,136,'+alpha+')';lctx.lineWidth=1.8*DPR;lctx.lineJoin='miter';lctx.lineCap='square';lctx.miterLimit=10;lctx.stroke();
-  });
+  lctx.fillStyle='#020305';
+  lctx.fillRect(0,0,W,H);
+  var SIZE=48*DPR;
+  var x,y;
+  lctx.lineWidth=0.8;
+  lctx.strokeStyle='#2a2a2a';
+  for(x=0;x<=W;x+=SIZE){lctx.beginPath();lctx.moveTo(x,0);lctx.lineTo(x,H);lctx.stroke();}
+  for(y=0;y<=H;y+=SIZE){lctx.beginPath();lctx.moveTo(0,y);lctx.lineTo(W,y);lctx.stroke();}
+  lctx.strokeStyle='#3a3a3a';
+  lctx.lineWidth=1.2;
+  for(x=0;x<=W;x+=SIZE*5){lctx.beginPath();lctx.moveTo(x,0);lctx.lineTo(x,H);lctx.stroke();}
+  for(y=0;y<=H;y+=SIZE*5){lctx.beginPath();lctx.moveTo(0,y);lctx.lineTo(W,y);lctx.stroke();}
+  var total=lines.length;
+  for(var li=0;li<total;li++){
+    var line=lines[li];
+    var isNewest=li===total-1;
+    var alpha=isNewest?0.88:0.08+(li/(total-1||1))*0.35;
+    if(line.drawIdx<1) continue;
+    lctx.beginPath();
+    lctx.moveTo(line.pts[0].x,line.pts[0].y);
+    for(var k=1;k<=line.drawIdx&&k<line.pts.length;k++){
+      lctx.lineTo(line.pts[k].x,line.pts[k].y);
+    }
+    lctx.strokeStyle='rgba(0,255,136,'+alpha+')';
+    lctx.lineWidth=1.8*DPR;
+    lctx.lineJoin='miter';
+    lctx.lineCap='square';
+    lctx.miterLimit=10;
+    lctx.stroke();
+  }
 }
 function drawDot(){
   dctx.clearRect(0,0,W,H);
-  const front=lines[lines.length-1];
-  const cur=front.pts[front.drawIdx];
-  const glowR=(14+Math.sin(tick*0.08)*4)*DPR;
-  const grd=dctx.createRadialGradient(cur.x,cur.y,0,cur.x,cur.y,glowR);
-  grd.addColorStop(0,'rgba(0,255,136,0.45)');grd.addColorStop(1,'rgba(0,255,136,0)');
-  dctx.fillStyle=grd;dctx.beginPath();dctx.arc(cur.x,cur.y,glowR,0,Math.PI*2);dctx.fill();
-  const blink=0.5+0.5*Math.sin(tick*0.25);
-  dctx.fillStyle='rgba(0,255,136,'+blink+')';dctx.beginPath();dctx.arc(cur.x,cur.y,4*DPR,0,Math.PI*2);dctx.fill();
-  dctx.strokeStyle='rgba(0,255,136,'+(blink*0.4)+')';dctx.lineWidth=1*DPR;dctx.beginPath();dctx.arc(cur.x,cur.y,9*DPR,0,Math.PI*2);dctx.stroke();
+  var front=lines[lines.length-1];
+  if(!front||front.drawIdx<1) return;
+  var cur=front.pts[front.drawIdx];
+  var glowR=(14+Math.sin(tick*0.08)*4)*DPR;
+  var grd=dctx.createRadialGradient(cur.x,cur.y,0,cur.x,cur.y,glowR);
+  grd.addColorStop(0,'rgba(0,255,136,0.45)');
+  grd.addColorStop(1,'rgba(0,255,136,0)');
+  dctx.fillStyle=grd;
+  dctx.beginPath();
+  dctx.arc(cur.x,cur.y,glowR,0,Math.PI*2);
+  dctx.fill();
+  var blink=0.5+0.5*Math.sin(tick*0.25);
+  dctx.fillStyle='rgba(0,255,136,'+blink+')';
+  dctx.beginPath();
+  dctx.arc(cur.x,cur.y,4*DPR,0,Math.PI*2);
+  dctx.fill();
+  dctx.strokeStyle='rgba(0,255,136,'+(blink*0.4)+')';
+  dctx.lineWidth=1*DPR;
+  dctx.beginPath();
+  dctx.arc(cur.x,cur.y,9*DPR,0,Math.PI*2);
+  dctx.stroke();
 }
 function frame(){
-  tick++;sub+=SPEED;
-  const steps=Math.floor(sub);sub-=steps;
-  const front=lines[lines.length-1];
+  tick++;
+  sub+=SPEED;
+  var steps=Math.floor(sub);
+  sub-=steps;
+  var front=lines[lines.length-1];
+  if(front&&!front.done){
     front.drawIdx=Math.min(front.drawIdx+steps,front.pts.length-1);
-    if(front.drawIdx>=front.pts.length-1){front.done=true;setTimeout(spawnLine,800);}
+    if(front.drawIdx>=front.pts.length-1){
+      front.done=true;
+      setTimeout(spawnLine,800);
+    }
   }
-  drawLines();drawDot();
+  drawLines();
+  drawDot();
   requestAnimationFrame(frame);
 }
 frame();
