@@ -123,7 +123,7 @@ nav {
 .nav-hamburger.open .bar:nth-child(2) { opacity: 0; }
 .nav-hamburger.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 .nav-mobile-menu {
-  display: none;
+  display: block;
   position: fixed;
   top: 61px;
   left: 0;
@@ -138,6 +138,7 @@ nav {
   transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.3s ease;
 }
 .nav-mobile-menu.open {
+  display: block;
   max-height: 300px;
   padding: 16px 20px 24px;
 }
