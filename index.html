@@ -52,7 +52,7 @@ body::before {
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 100;
+  z-index: 200;
   padding: 20px 40px;
   display: flex;
   align-items: center;
@@ -175,7 +175,7 @@ nav {
 }
 
 /* HERO */
-.hero { position:relative; z-index:3;
+.hero { position:relative; z-index:50;
   
   
   
@@ -998,7 +998,7 @@ footer {
   nav { padding: 16px 20px; }
   .nav-hamburger { display: flex; }
   .nav-links { display: none; }
-  .hero { position:relative; z-index:3; padding: 100px 20px 60px; }
+  .hero { position:relative; z-index:50; padding: 100px 20px 60px; }
   .container { padding: 0 20px; }
   .steps-grid, .features-grid, .pricing-grid, .testi-grid { grid-template-columns: 1fr; }
   .demo-layout { grid-template-columns: 1fr; }
@@ -1541,8 +1541,8 @@ function setLang(lang) {
 })();
 </script>
 
-<canvas id="lineC" style="position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;"></canvas>
-<canvas id="dotC"  style="position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;"></canvas>
+<canvas id="lineC" style="position:fixed;inset:0;width:100%;height:100%;z-index:10;pointer-events:none;"></canvas>
+<canvas id="dotC"  style="position:fixed;inset:0;width:100%;height:100%;z-index:11;pointer-events:none;"></canvas>
 <script>
 (function(){
 const lineC=document.getElementById('lineC'),dotC=document.getElementById('dotC');
