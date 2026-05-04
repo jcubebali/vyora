@@ -361,31 +361,6 @@ class AutoBot:
 
         balance = get_balance("USDT")
         log.info(f"💰 Balance: ${balance:.4f} USDT")
-        # Push cycle count ke Firestore
-        if FIRESTORE_OK:
-            try:
-                update_balance(balance, 0, 0, 0)
-                # Update bot status
-                import json, urllib.request
-                from update_stats import get_token
-                token = get_token()
-                uid = open(os.path.expanduser("~/.nexus_uid")).read().strip()
-                doc = {"fields": {
-                    "botCycle": {"stringValue": str(cycle)},
-                    "botStatus": {"stringValue": "RUNNING"},
-                    "botLastSeen": {"stringValue": datetime.now().isoformat()}
-                }}
-                mask = "updateMask.fieldPaths=botCycle&updateMask.fieldPaths=botStatus&updateMask.fieldPaths=botLastSeen"
-                url = f"https://firestore.googleapis.com/v1/projects/nexus-trade-e449e/databases/(default)/documents/users/{uid}?{mask}"
-                body = json.dumps(doc).encode()
-                req = urllib.request.Request(url, data=body, headers={
-                    "Authorization": f"Bearer {token}",
-                    "Content-Type": "application/json"
-                }, method="PATCH")
-                urllib.request.urlopen(req)
-                log.info(f"[FIRESTORE] Cycle #{cycle} pushed")
-            except Exception as fe:
-                log.error(f"[FIRESTORE] Cycle push error: {fe}")
 
         for symbol in SYMBOLS:
             try:
