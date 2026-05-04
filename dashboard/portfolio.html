@@ -94,15 +94,19 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div class="sidebar">
   <div class="sidebar-logo">VYORA<span>.</span></div>
   <nav class="sidebar-nav">
-    <a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a>
-    <a href="signals.html" class="nav-item"><span>🎯</span> Sinyal Live</a>
-    <a href="bot.html" class="nav-item"><span>🤖</span> Auto Bot</a>
-    <a href="trades.html" class="nav-item"><span>📋</span> Riwayat Trade</a>
-    <a href="ai-chat.html" class="nav-item"><span>🧠</span> AI Advisor</a>
-    <a href="portfolio.html" class="nav-item active"><span>💼</span> Portfolio</a>
-    <a href="settings.html" class="nav-item"><span>⚙️</span> Settings</a>
-    <a href="billing.html" class="nav-item"><span>💳</span> Billing</a>
-    <a href="login.html" class="nav-item"><span>🚪</span> Logout</a>
+    <div class="sidebar-section">Main</div>
+    <a href="dashboard.html" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="signals.html" class="nav-item"><span class="nav-icon">🎯</span> Sinyal Live<span class="nav-badge">3</span></a>
+    <a href="#" class="nav-item nav-locked" id="nav-bot" onclick="checkAccess(event,'bot','Pro')"><span class="nav-icon">🤖</span> Auto Bot<span class="nav-lock" id="lock-bot">🔒</span></a>
+    <a href="trades.html" class="nav-item"><span class="nav-icon">📋</span> Riwayat Trade</a>
+    <div class="sidebar-section">Tools</div>
+    <a href="#" class="nav-item nav-locked" id="nav-ai" onclick="checkAccess(event,'ai','Pro')"><span class="nav-icon">🧠</span> AI Advisor<span class="nav-lock" id="lock-ai">🔒</span></a>
+    <a href="#" class="nav-item nav-locked" id="nav-portfolio" onclick="checkAccess(event,'portfolio','Pro')"><span class="nav-icon">💼</span> Portfolio<span class="nav-lock" id="lock-portfolio">🔒</span></a>
+    <a href="alerts.html" class="nav-item"><span class="nav-icon">🔔</span> Price Alerts</a>
+    <div class="sidebar-section">Account</div>
+    <a href="settings.html" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    <a href="billing.html" class="nav-item"><span class="nav-icon">💳</span> Billing</a>
+    <a href="#" class="nav-item" onclick="logoutUser()"><span class="nav-icon">🚪</span> Logout</a>
   </nav>
   </div>
   </div>
