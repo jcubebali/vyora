@@ -89,8 +89,16 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .upgrade-modal-btn{background:#00ff88;color:#000;border:none;padding:12px 24px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;font-size:0.9rem;margin-bottom:10px;}
 .upgrade-modal-close{color:#334455;font-size:0.8rem;cursor:pointer;background:none;border:none;}
 </style>
+<script>
+// Fallback visibility
+setTimeout(function(){
+  if(document.body.style.visibility==='hidden'){
+    document.body.style.visibility='visible';
+  }
+},2000);
+</script>
 </head>
-<body>
+<body style="visibility:hidden">
 <div class="sidebar">
   <div class="sidebar-logo">VYORA<span>.</span></div>
   <nav class="sidebar-nav">

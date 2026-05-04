@@ -246,8 +246,16 @@ function toggleSidebar(){
   document.body.style.overflow=isOpen?'hidden':'';
 }
 </script>
+<script>
+// Fallback visibility
+setTimeout(function(){
+  if(document.body.style.visibility==='hidden'){
+    document.body.style.visibility='visible';
+  }
+},2000);
+</script>
 </head>
-<body>
+<body style="visibility:hidden">
 
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -1086,7 +1094,8 @@ async function loadTradeHistory(uid) {
     th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat</div>';
   }
 }
-window._loggingOut=false;}
+window._loggingOut=false;
+document.body.style.visibility="visible";}
   } else {
 async function loadTradeHistory(uid) {
   const th = document.getElementById('trade-history');
@@ -1119,7 +1128,8 @@ async function loadTradeHistory(uid) {
     th.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:0.8rem">Belum ada riwayat</div>';
   }
 }
-window._loggingOut=false;}
+window._loggingOut=false;
+document.body.style.visibility="visible";}
 };
 
 
