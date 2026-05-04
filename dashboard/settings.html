@@ -107,7 +107,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
     <!-- BINANCE API -->
     <div class="settings-section">
-      <div class="section-title">🔑 Binance API Key</div>
+      <div class="section-title">🔑 Binance API Key <span style="background:rgba(255,165,0,0.2);color:orange;font-size:0.6rem;padding:2px 8px;border-radius:4px;margin-left:8px">COMING SOON</span></div>
       <div class="settings-card">
         <div class="settings-row">
           <div>
@@ -117,7 +117,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         </div>
         <div style="margin-bottom:12px">
           <div class="form-input-group">
-            <input type="password" class="form-input" id="api-key" placeholder="Masukkan Binance API Key kamu">
+            <input type="password" class="form-input" id="api-key" placeholder="Coming soon..." disabled style="opacity:0.5;cursor:not-allowed">
             <button class="show-btn" onclick="toggleInput('api-key')">Tampilkan</button>
           </div>
           <div class="key-status pending" id="key-status">○ Belum diverifikasi</div>
@@ -125,13 +125,15 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div style="margin-bottom:16px">
           <label style="font-size:0.72rem;color:var(--text-dim);display:block;margin-bottom:6px">API Secret</label>
           <div class="form-input-group">
-            <input type="password" class="form-input" id="api-secret" placeholder="Masukkan API Secret kamu">
+            <input type="password" class="form-input" id="api-secret" placeholder="Coming soon..." disabled style="opacity:0.5;cursor:not-allowed">
             <button class="show-btn" onclick="toggleInput('api-secret')">Tampilkan</button>
           </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center">
-          <button class="btn-test" onclick="testApiKey()">🔍 Test Koneksi</button>
-          <div style="font-size:0.72rem;color:var(--text-dim)">API key disimpan terenkripsi AES-256</div>
+          <button class="btn-test" disabled style="opacity:0.5;cursor:not-allowed">🔍 Test Koneksi</button>
+          <div style="margin-top:12px;padding:12px;background:rgba(255,165,0,0.05);border:1px solid rgba(255,165,0,0.2);border-radius:8px;font-size:0.75rem;color:#aa7700;line-height:1.6">
+            ⚠️ Fitur integrasi API key personal sedang dalam pengembangan. Saat ini bot Vyora trading menggunakan akun internal kami. Sinyal dan performa dapat dilihat di dashboard.
+          </div>
         </div>
         <div style="margin-top:14px;padding:12px;background:rgba(240,180,41,0.06);border:1px solid rgba(240,180,41,0.15);border-radius:6px;font-size:0.75rem;color:var(--gold)">
           ⚠️ Pastikan API key TIDAK punya izin Withdraw. Hanya aktifkan: Enable Reading + Enable Spot Trading
