@@ -173,12 +173,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 </div>
 
 <script>
-const trades = [
-  {time:'2026-04-27 03:23',action:'SELL_TP',pair:'BTC/USDT',entry:77619.99,exit:78316.45,qty:0.00007,pnl:0.0487,status:'WIN'},
-  {time:'2026-04-26 07:44',action:'BUY',pair:'BTC/USDT',entry:77619.99,exit:null,qty:0.00007,pnl:null,status:'CLOSED'},
-  {time:'2026-04-21 20:26',action:'SELL_TP',pair:'BTC/USDT',entry:74578.30,exit:76359.23,qty:0.00012,pnl:0.1128,status:'WIN'},
-  {time:'2026-04-14 21:35',action:'BUY',pair:'BTC/USDT',entry:74578.30,exit:null,qty:0.00012,pnl:null,status:'CLOSED'},
-];
+const trades = [];
 
 let filtered = [...trades];
 
@@ -254,12 +249,51 @@ window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(aut
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
 const auth=getAuth(app);
 const db=getFirestore(app);
 onAuthStateChanged(auth,async(u)=>{
   if(!u) return;
+  
+  // Load trades dari Firestore
+  try {
+    const q = query(
+      collection(db,'trades'),
+      where('uid','==',u.uid),
+      orderBy('timestamp','desc'),
+      limit(100)
+    );
+    const tSnap = await getDocs(q);
+    tSnap.forEach(d => {
+      const t = d.data();
+      const pnl = parseFloat(t.pnlUsdt || 0);
+      const pnlPct = parseFloat(t.pnlPct || 0);
+      trades.push({
+        time: t.timestamp ? new Date(t.timestamp).toLocaleString('id-ID') : '--',
+        action: pnl >= 0 ? 'WIN' : 'LOSS',
+        pair: t.symbol || 'BTCUSDT',
+        entry: '$' + parseFloat(t.entryPrice||0).toLocaleString('en',{minimumFractionDigits:2}),
+        exit: '$' + parseFloat(t.exitPrice||0).toLocaleString('en',{minimumFractionDigits:2}),
+        qty: t.quantity || 0,
+        pnl: (pnl>=0?'+':'')+'$'+pnl.toFixed(4),
+        pnlPct: (pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%',
+        status: t.status || 'CLOSED'
+      });
+    });
+    const wins = trades.filter(t=>t.action==='WIN').length;
+    const losses = trades.filter(t=>t.action==='LOSS').length;
+    const totalPnl = trades.reduce((s,t)=>s+parseFloat(t.pnl.replace('$','').replace('+','')),0);
+    const wr = trades.length>0?(wins/trades.length*100).toFixed(0):0;
+    const els = document.querySelectorAll('.sum-value');
+    if(els[0]) els[0].textContent = trades.length;
+    if(els[1]) els[1].textContent = wins;
+    if(els[2]) els[2].textContent = losses;
+    if(els[3]) els[3].textContent = wr+'%';
+    if(els[4]) els[4].textContent = (totalPnl>=0?'+':'')+'$'+totalPnl.toFixed(4);
+    renderTrades();
+  } catch(e) { console.error('Load trades:', e); renderTrades(); }
+
   try {
     const snap=await getDoc(doc(db,'users',u.uid));
     const nm=document.getElementById('sidebar-user-name');
@@ -283,7 +317,7 @@ onAuthStateChanged(auth,async(u)=>{
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,getDocs}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",storageBucket:"vyora-e449e.firebasestorage.app",messagingSenderId:"354555982240",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
 const auth=getAuth(app);
 const db=getFirestore(app);
