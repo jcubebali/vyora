@@ -1521,7 +1521,9 @@ function setLang(lang) {
 (function(){
   var btn=document.getElementById('hamburgerBtn');
   var menu=document.getElementById('mobileMenu');
-  btn.addEventListener('click',function(){
+  if(!btn||!menu) return;
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
     var open=menu.classList.toggle('open');
     btn.classList.toggle('open',open);
     document.body.style.overflow=open?'hidden':'';
@@ -1534,6 +1536,7 @@ function setLang(lang) {
     });
   });
   document.addEventListener('click',function(e){
+    if(e.target!==btn && !btn.contains(e.target) && e.target!==menu && !menu.contains(e.target)){
       menu.classList.remove('open');
       btn.classList.remove('open');
       document.body.style.overflow='';
