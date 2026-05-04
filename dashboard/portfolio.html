@@ -288,6 +288,39 @@ onAuthStateChanged(auth,async(u)=>{
   }
 });
 </script>
+<!-- vyora-plan-sync -->
+<script type="module">
+import{initializeApp,getApps}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const _app=getApps().length?getApps()[0]:initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
+const _auth=getAuth(_app);
+const _db=getFirestore(_app);
+onAuthStateChanged(_auth,async(u)=>{
+  if(!u) return;
+  try{
+    const snap=await getDoc(doc(_db,'users',u.uid));
+    if(snap.exists()){
+      const plan=snap.data().plan||'trial';
+      localStorage.setItem('vyora_plan',plan);
+      window._userPlan=plan;
+      // Unlock menu sesuai plan
+      const planOrder={trial:0,basic:1,pro:2,elite:3};
+      if((planOrder[plan]||0)>=2){
+        ['nav-bot','nav-ai','nav-portfolio'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el){
+            el.classList.add('unlocked');
+            el.href=id==='nav-bot'?'bot.html':id==='nav-ai'?'ai-chat.html':'portfolio.html';
+            const lk=el.querySelector('.nav-lock');
+            if(lk) lk.style.display='none';
+          }
+        });
+      }
+    }
+  }catch(e){}
+});
+</script>
 </body>
 </html>
 <script type="module">
