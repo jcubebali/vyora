@@ -361,6 +361,51 @@ tr:hover td{background:rgba(255,255,255,.01);}
       </div>
     </div>
 
+
+    <!-- OPEN POSITION -->
+    <div id="open-pos-section" style="display:none;margin-bottom:16px;">
+      <div class="card" style="border-color:rgba(52,211,153,.25);box-shadow:0 0 20px rgba(52,211,153,.05);">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon green"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+            <span class="card-title" style="font-family:var(--fd);font-size:15px;color:var(--text)">POSISI OPEN</span>
+          </div>
+          <div class="live-pill"><div class="pulse"></div>LIVE</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Entry</div>
+            <div style="font-family:var(--fm);font-size:13px;font-weight:600;color:var(--blue)" id="op-entry">$--</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Sekarang</div>
+            <div style="font-family:var(--fm);font-size:13px;font-weight:600;color:var(--text)" id="op-current">$--</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">PnL</div>
+            <div style="font-family:var(--fm);font-size:13px;font-weight:600" id="op-pnl">+$--</div>
+          </div>
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Peak</div>
+            <div style="font-family:var(--fm);font-size:13px;font-weight:600;color:var(--yellow)" id="op-peak">$--</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          <div style="background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Hard TP</div>
+            <div style="font-family:var(--fm);font-size:12px;font-weight:600;color:var(--green)" id="op-tp">$--</div>
+          </div>
+          <div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Trail SL</div>
+            <div style="font-family:var(--fm);font-size:12px;font-weight:600;color:var(--yellow)" id="op-trail">$--</div>
+          </div>
+          <div style="background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Hard SL</div>
+            <div style="font-family:var(--fm);font-size:12px;font-weight:600;color:var(--red)" id="op-sl">$--</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- MAIN GRID -->
     <div class="grid-main">
       <!-- LEFT: Bot + Chart -->
@@ -727,6 +772,28 @@ onAuthStateChanged(auth,async(u)=>{
     }
     localStorage.setItem('vyora_plan',plan);
 
+    // Update open position
+    function updateOpenPos(d){
+      const sec = document.getElementById('open-pos-section');
+      if(!d.openPosition || d.openPosition.status === 'CLOSED'){
+        if(sec) sec.style.display='none';
+        return;
+      }
+      const op = d.openPosition;
+      if(sec) sec.style.display='block';
+      const pnl = parseFloat(op.pnlUsdt||0);
+      const pnlPct = parseFloat(op.pnlPct||0);
+      document.getElementById('op-entry').textContent = '$'+parseFloat(op.entry||0).toLocaleString('en',{minimumFractionDigits:2});
+      document.getElementById('op-current').textContent = '$'+parseFloat(op.current||0).toLocaleString('en',{minimumFractionDigits:2});
+      const pnlEl = document.getElementById('op-pnl');
+      if(pnlEl){pnlEl.textContent=(pnl>=0?'+':'')+pnl.toFixed(4)+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%)';pnlEl.style.color=pnl>=0?'var(--green)':'var(--red)';}
+      document.getElementById('op-peak').textContent = '$'+parseFloat(op.peak||0).toLocaleString('en',{minimumFractionDigits:2});
+      document.getElementById('op-tp').textContent = '$'+parseFloat(op.hardTP||0).toLocaleString('en',{minimumFractionDigits:2});
+      document.getElementById('op-trail').textContent = '$'+parseFloat(op.trailSL||0).toLocaleString('en',{minimumFractionDigits:2});
+      document.getElementById('op-sl').textContent = '$'+parseFloat(op.hardSL||0).toLocaleString('en',{minimumFractionDigits:2});
+    }
+    updateOpenPos(d);
+
     // Real-time bot cycle
     setInterval(async()=>{
       try{
@@ -738,6 +805,7 @@ onAuthStateChanged(auth,async(u)=>{
           if(botCycle) botCycle.textContent='Bot Aktif · Cycle #'+(dd.botCycle||'0');
           if(bal) bal.textContent='$'+parseFloat(dd.totalUsdt||0).toFixed(2);
           if(botBal) botBal.textContent='$'+parseFloat(dd.totalUsdt||0).toFixed(2);
+          updateOpenPos(dd);
         }
       }catch(e){}
     },30000);
