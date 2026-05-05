@@ -284,10 +284,11 @@ tr:hover td{background:rgba(255,255,255,.01);}
         </button>
         <div class="notif-dot" id="notif-dot"></div>
       </div>
-      <div class="user-pill">
-        <div class="avatar" id="user-avatar">P</div>
-        <div><div class="u-name" id="user-name">Loading...</div><div class="u-plan" id="user-plan">--</div></div>
+      <div class="user-pill" style="padding:4px 8px;">
+        <div class="avatar" id="user-avatar">PJ</div>
+        <div class="u-plan" id="user-plan" style="font-size:9px;">--</div>
       </div>
+      <div id="user-name" style="display:none"></div>
 
     </div>
   </div>
@@ -637,7 +638,11 @@ onAuthStateChanged(auth,async(u)=>{
     const spls=document.getElementById('sidebar-plan-sub');
     if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
     if(pl) pl.textContent=plan.toUpperCase();
-    if(av) av.textContent=(d.name||u.displayName||'U')[0].toUpperCase();
+    // 2 huruf inisial
+    const fullName=d.name||u.displayName||u.email.split('@')[0]||'U';
+    const parts=fullName.trim().split(' ');
+    const initials=parts.length>=2?(parts[0][0]+parts[1][0]).toUpperCase():fullName.substring(0,2).toUpperCase();
+    if(av) av.textContent=initials;
     if(spl) spl.textContent=plan.toUpperCase()+' PLAN';
     if(spls) spls.textContent=plan==='trial'?'Free Trial Aktif':plan==='elite'?'Akses Penuh':'Aktif';
 
