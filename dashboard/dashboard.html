@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VYORA — Dashboard</title>
 <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/dbckdslrw/image/upload/v1777721734/Vyora_20260502_110933_0000_3_y1mk8l.jpg">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <script>if(document.body)document.body.style.visibility='hidden';setTimeout(()=>{document.body&&(document.body.style.visibility='visible')},2000);</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -227,8 +227,7 @@ tr:hover td{background:rgba(255,255,255,.01);}
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="logo">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
-    <div><div class="logo-name">VYORA<span style="color:var(--blue)">.</span></div><div class="logo-ver">AI TRADING v5.0</div></div>
+    <div style="flex:1"><div class="logo-name" style="font-family:'Bebas Neue',var(--fd);font-size:22px;letter-spacing:3px;color:var(--text)">VYORA<span style="color:var(--green)">.</span></div><div class="logo-ver">AI TRADING v5.0</div></div>
     <button class="logo-close" id="sideClose"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
   <nav class="nav">
@@ -772,5 +771,18 @@ onAuthStateChanged(auth,async(u)=>{
   window.logoutUser=async()=>{await signOut(auth);window.location.href='login.html';};
 });
 </script>
+
+<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:20px 28px;flex-shrink:0;">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div style="font-family:'Bebas Neue',var(--fd);font-size:18px;letter-spacing:3px;color:var(--text)">VYORA<span style="color:var(--green)">.</span></div>
+    <ul style="display:flex;gap:20px;list-style:none;flex-wrap:wrap;">
+      <li><a href="../index.html" style="font-size:11px;color:var(--muted);text-decoration:none;">Landing Page</a></li>
+      <li><a href="signals.html" style="font-size:11px;color:var(--muted);text-decoration:none;">Sinyal Live</a></li>
+      <li><a href="trades.html" style="font-size:11px;color:var(--muted);text-decoration:none;">Riwayat</a></li>
+      <li><a href="billing.html" style="font-size:11px;color:var(--muted);text-decoration:none;">Billing</a></li>
+    </ul>
+    <p style="font-size:11px;color:var(--muted);">© 2026 Vyora by J-CUBE &nbsp;|&nbsp; All Rights Reserved</p>
+  </div>
+</footer>
 </body>
 </html>
