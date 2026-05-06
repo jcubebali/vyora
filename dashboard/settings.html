@@ -359,27 +359,66 @@ function toggleSetting(el) {
 }
 
 async function testApiKey() {
-  const key = document.getElementById('api-key').value;
+  const key = document.getElementById('api-key').value.trim();
+  const secret = document.getElementById('api-secret').value.trim();
   const statusEl = document.getElementById('key-status');
 
-  if(!key) { statusEl.className='key-status invalid'; statusEl.textContent='✗ Masukkan API key dulu'; return; }
+  if(!key || !secret) { 
+    statusEl.className='key-status invalid'; 
+    statusEl.textContent='✗ Masukkan API key dan Secret dulu'; 
+    return; 
+  }
 
   statusEl.className='key-status pending';
-  statusEl.textContent='⟳ Menguji koneksi...';
+  statusEl.textContent='⟳ Menguji koneksi ke Binance...';
 
-  // Simulasi test
-  setTimeout(() => {
-    if(key.length > 10) {
+  try {
+    // Test real ke Binance via proxy-free endpoint
+    const ts = Date.now();
+    const r = await fetch('https://api.binance.com/api/v3/ping');
+    if(r.ok) {
+      // Cek format key
+      if(key.length < 20 || secret.length < 20) {
+        statusEl.className='key-status invalid';
+        statusEl.textContent='✗ Format API key tidak valid';
+        return;
+      }
       statusEl.className='key-status valid';
-      statusEl.textContent='✓ Koneksi berhasil · Balance: $14.01 USDT';
-    } else {
-      statusEl.className='key-status invalid';
-      statusEl.textContent='✗ API key tidak valid';
+      statusEl.textContent='✓ Format API key valid · Siap disimpan';
+      // Auto save setelah test berhasil
+      await saveApiKeys(key, secret);
     }
-  }, 1500);
+  } catch(e) {
+    statusEl.className='key-status invalid';
+    statusEl.textContent='✗ Koneksi gagal: ' + e.message;
+  }
+}
+
+async function saveApiKeys(key, secret) {
+  if(!window._vyoraUid) return;
+  try {
+    const {getFirestore, doc, updateDoc} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const db = getFirestore();
+    await updateDoc(doc(db, 'users', window._vyoraUid), {
+      binanceApiKey: key,
+      binanceApiSecret: secret,
+      apiKeyStatus: 'pending_verification',
+      apiKeyUpdatedAt: new Date().toISOString()
+    });
+    console.log('API key saved to Firestore');
+  } catch(e) {
+    console.error('Save API key error:', e);
+  }
 }
 
 function saveAll() {
+  const key = document.getElementById('api-key').value.trim();
+  const secret = document.getElementById('api-secret').value.trim();
+  
+  if(key && secret) {
+    saveApiKeys(key, secret);
+  }
+  
   const successEl = document.getElementById('alert-success');
   successEl.style.display = 'block';
   setTimeout(() => successEl.style.display='none', 3000);
@@ -390,7 +429,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 const app = initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"vyora-e449e.firebaseapp.com",projectId:"vyora-e449e",appId:"1:354555982240:web:4bad26e3507918a5b634c5"});
 const auth = getAuth(app);
-onAuthStateChanged(auth, (user) => { if (!user) window.location.href = "login.html"; });
+onAuthStateChanged(auth, (user) => { 
+  if (!user) window.location.href = "login.html";
+  else window._vyoraUid = user.uid;
+});
 window.doLogout = async () => { if(confirm("Yakin logout?")) { await signOut(auth); window.location.href = "login.html"; } };
 </script>
 
