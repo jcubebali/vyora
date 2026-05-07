@@ -411,6 +411,31 @@ tr:hover td{background:rgba(255,255,255,.01);}
         </div>
       </div>
     </div>
+    <!-- FUTURES KPI -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="card" style="border-color:rgba(251,191,36,.2);">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon amber"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 22 6 22 12"/></svg></div>
+            <span class="card-title">Futures Balance</span>
+          </div>
+          <span style="background:rgba(251,191,36,.1);color:var(--yellow);font-family:var(--fm);font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;border:1px solid rgba(251,191,36,.2)">5x LEV</span>
+        </div>
+        <div class="metric-val" id="fut-bal-dash" style="color:var(--yellow)">$--</div>
+        <div class="metric-sub"><a href="futures.html" style="color:var(--blue);font-size:11px;text-decoration:none;">Lihat Futures →</a></div>
+      </div>
+      <div class="card" style="border-color:rgba(251,191,36,.2);">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon amber"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <span class="card-title">Futures Position</span>
+          </div>
+        </div>
+        <div class="metric-val" id="fut-pos-dash" style="font-size:14px;color:var(--muted)">Tidak ada posisi</div>
+        <div class="metric-sub" id="fut-pos-pnl-dash">--</div>
+      </div>
+    </div>
+
     <!-- MAIN GRID -->
     <div class="grid-main">
       <!-- LEFT: Bot + Chart -->
@@ -799,6 +824,37 @@ onAuthStateChanged(auth,async(u)=>{
     }
     updateOpenPos(d);
 
+    // Update futures position
+    function updateFuturesDash(d){
+      const fp = d.futuresPosition || {};
+      const futBal = document.getElementById('fut-bal-dash');
+      const futPos = document.getElementById('fut-pos-dash');
+      const futPnl = document.getElementById('fut-pos-pnl-dash');
+      
+      // Update balance - baca dari Binance futures API tidak bisa langsung
+      // Tampilkan data dari futuresPosition
+      if(fp.status === 'OPEN' && fp.symbol){
+        const pnl = parseFloat(fp.pnlUsdt||0);
+        const pnlPct = parseFloat(fp.pnlPct||0);
+        const isLong = fp.side === 'LONG';
+        if(futPos){
+          futPos.textContent = fp.symbol + ' ' + (isLong?'↑ LONG':'↓ SHORT');
+          futPos.style.color = isLong ? 'var(--green)' : 'var(--red)';
+          futPos.style.fontSize = '14px';
+        }
+        if(futPnl){
+          futPnl.textContent = (pnl>=0?'+':'')+'$'+pnl.toFixed(4)+' ('+(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%)';
+          futPnl.style.color = pnl>=0 ? 'var(--green)' : 'var(--red)';
+        }
+        if(futBal) futBal.textContent = '$'+parseFloat(fp.current||0).toLocaleString('en',{minimumFractionDigits:2});
+      } else {
+        if(futPos){futPos.textContent='Tidak ada posisi';futPos.style.color='var(--muted)';}
+        if(futPnl){futPnl.textContent='Bot menunggu signal';futPnl.style.color='var(--muted)';}
+        if(futBal) futBal.textContent='$--';
+      }
+    }
+    updateFuturesDash(d);
+
     // Real-time bot cycle
     setInterval(async()=>{
       try{
@@ -811,6 +867,7 @@ onAuthStateChanged(auth,async(u)=>{
           if(bal) bal.textContent='$'+parseFloat(dd.totalUsdt||0).toFixed(2);
           if(botBal) botBal.textContent='$'+parseFloat(dd.totalUsdt||0).toFixed(2);
           updateOpenPos(dd);
+          updateFuturesDash(dd);
         }
       }catch(e){}
     },30000);
