@@ -299,7 +299,7 @@ tr:hover td{background:rgba(255,255,255,.01);}
   </div>
 
   <!-- CONTENT -->
-  <div class="content">
+  <div class="content" id="main-content" style="opacity:0;transition:opacity 0.3s ease;">
     <!-- PAGE HEADER -->
     <div class="page-header">
       <div>
@@ -697,8 +697,12 @@ const db=getFirestore(app);
 
 onAuthStateChanged(auth,async(u)=>{
   if(!u){window.location.replace('login.html');return;}
-  // Show body setelah semua data siap
-  setTimeout(()=>{ document.body.style.visibility='visible'; }, 100);
+  // Show body dan content setelah data siap
+  document.body.style.visibility='visible';
+  setTimeout(()=>{
+    const mc = document.getElementById('main-content');
+    if(mc) mc.style.opacity='1';
+  }, 150);
 
   try{
     const snap=await getDoc(doc(db,'users',u.uid));
