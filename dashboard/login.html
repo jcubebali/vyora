@@ -142,7 +142,20 @@ onAuthStateChanged(auth,u=>{if(u)window.location.href='dashboard.html';});
 async function saveUser(u,name=''){
   const r=doc(db,'users',u.uid);
   const s=await getDoc(r);
-  if(!s.exists())await setDoc(r,{uid:u.uid,email:u.email,name:name||u.displayName||'',plan:'trial',trialEndsAt:new Date(Date.now()+7*864e5),createdAt:new Date().toISOString(),totalPnl:0,totalTrades:0});
+  if(!s.exists())await setDoc(r,{
+    uid:u.uid,
+    email:u.email,
+    name:name||u.displayName||'',
+    plan:'trial',
+    trialEndsAt:new Date(Date.now()+7*864e5).toISOString(),
+    createdAt:new Date().toISOString(),
+    totalPnl:0,
+    totalTrades:0,
+    totalUsdt:0,
+    winRate:0,
+    botCycle:'0',
+    botStatus:'STOPPED'
+  });
 }
 window.doLogin=async()=>{
   const e=document.getElementById('le').value.trim();
@@ -150,7 +163,7 @@ window.doLogin=async()=>{
   const b=document.getElementById('btnL');
   if(!e||!p){showErr('Isi email dan password!');return;}
   b.disabled=true;b.innerHTML='<span class="spin"></span>Masuk...';
-  try{await signInWithEmailAndPassword(auth,e,p);showOk('Berhasil! Mengalihkan...');}
+  try{const uc=await signInWithEmailAndPassword(auth,e,p);await saveUser(uc.user);showOk('Berhasil! Mengalihkan...');}
   catch(x){showErr(x.code==='auth/invalid-credential'?'Email atau password salah':x.message);b.disabled=false;b.textContent='Masuk ke Dashboard';}
 };
 window.doRegister=async()=>{
@@ -165,7 +178,7 @@ window.doRegister=async()=>{
   catch(x){showErr(x.code==='auth/email-already-in-use'?'Email sudah terdaftar':x.message);b.disabled=false;b.textContent='Buat Akun Gratis';}
 };
 window.gLogin=async()=>{
-  try{const r=await signInWithPopup(auth,gp);await saveUser(r.user);showOk('Login Google berhasil!');}
+  try{const r=const gc=await signInWithPopup(auth,gp);await saveUser(gc.user);await saveUser(r.user);showOk('Login Google berhasil!');}
   catch(x){showErr('Gagal: '+x.message);}
 };
 window.sw=(t)=>{
