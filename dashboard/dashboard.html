@@ -918,22 +918,25 @@ async function loadNews(){
   const body = document.getElementById('news-body');
   if(!body) return;
   try{
-    const r = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN&sortOrder=latest&limit=8');
+    // Pakai RSS2JSON untuk convert RSS CoinDesk ke JSON
+    const rssUrl = encodeURIComponent('https://www.coindesk.com/arc/outboundfeeds/rss/');
+    const r = await fetch('https://api.rss2json.com/v1/api.json?rss_url='+rssUrl+'&count=8');
     const data = await r.json();
-    if(!data.Data || !data.Data.length){
+    if(!data.items || !data.items.length){
       body.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Tidak ada berita</div>';
       return;
     }
-    body.innerHTML = data.Data.map(n=>{
-      const time = new Date(n.published_on*1000);
+    body.innerHTML = data.items.map(n=>{
+      const time = new Date(n.pubDate);
       const ago = Math.floor((Date.now()-time)/60000);
-      const timeStr = ago<60?ago+' menit lalu':Math.floor(ago/60)+' jam lalu';
-      return `<a href="${n.url}" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
-        <img src="${n.imageurl}" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">
+      const timeStr = ago<60?ago+' menit lalu':ago<1440?Math.floor(ago/60)+' jam lalu':Math.floor(ago/1440)+' hari lalu';
+      const img = n.thumbnail || n.enclosure?.link || '';
+      return `<a href="${n.link}" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
+        ${img?`<img src="${img}" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">`:'' }
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${n.title}</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:10px;color:var(--blue)">${n.source_info?.name||n.source||'Crypto News'}</span>
+            <span style="font-size:10px;color:var(--blue)">CoinDesk</span>
             <span style="font-size:10px;color:var(--muted)">${timeStr}</span>
           </div>
         </div>
