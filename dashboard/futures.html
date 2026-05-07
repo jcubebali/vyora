@@ -376,6 +376,22 @@ onAuthStateChanged(auth,async(u)=>{
     if(spl) spl.textContent=(d.plan||'trial').toUpperCase()+' PLAN';
     localStorage.setItem('vyora_plan',d.plan||'trial');
 
+    // Check Elite plan
+    if(d.plan !== 'elite'){
+      document.body.innerHTML = `
+        <div style="min-height:100vh;background:#0A0C14;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif">
+          <div style="text-align:center;padding:40px">
+            <div style="font-size:48px;margin-bottom:16px">🔒</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#EEF0F8;margin-bottom:8px">FITUR ELITE</div>
+            <div style="font-size:13px;color:#6B7190;margin-bottom:24px;line-height:1.6">Futures Bot hanya tersedia untuk paket Elite.<br>Upgrade sekarang untuk akses penuh.</div>
+            <a href="billing.html" style="background:#5C7CFF;color:#fff;padding:12px 28px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;display:inline-block;margin-right:8px">⬆ Upgrade ke Elite</a>
+            <a href="dashboard.html" style="background:transparent;color:#6B7190;padding:12px 28px;border-radius:8px;font-size:13px;text-decoration:none;display:inline-block;border:1px solid #1E2235">← Dashboard</a>
+          </div>
+        </div>`;
+      document.body.style.visibility='visible';
+      return;
+    }
+
     // Futures stats
     const fp=d.futuresPosition||{};
     renderPosition(fp);
