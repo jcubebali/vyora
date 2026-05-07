@@ -951,5 +951,53 @@ async function loadNews(){
 loadNews();
 setInterval(loadNews, 300000); // Refresh setiap 5 menit
 </script>
+
+<script>
+async function loadNews(){
+  var body = document.getElementById('news-body');
+  if(!body) return;
+  var portals = [
+    ['CoinDesk','https://coindesk.com','Berita & analisa terkini'],
+    ['CoinTelegraph','https://cointelegraph.com','Update cepat & mendalam'],
+    ['The Block','https://theblock.co','Analisa institusional'],
+    ['Decrypt','https://decrypt.co','Bahasa mudah dipahami'],
+    ['CryptoSlate','https://cryptoslate.com','Data & berita'],
+    ['Pintu Blog','https://pintu.co.id/blog','Crypto Indonesia']
+  ];
+  
+  try{
+    var r = await fetch('https://api.coingecko.com/api/v3/news?per_page=6');
+    var data = await r.json();
+    if(data.data && data.data.length){
+      var html = '';
+      data.data.forEach(function(n){
+        var ago = Math.floor((Date.now() - n.updated_at*1000)/60000);
+        var t = ago < 60 ? ago+' mnt lalu' : Math.floor(ago/60)+' jam lalu';
+        html += '<a href="'+n.url+'" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;">';
+        html += '<div style="flex:1;min-width:0">';
+        html += '<div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px">'+n.title+'</div>';
+        html += '<div><span style="font-size:10px;color:var(--blue)">'+(n.news_site||'Crypto')+'</span>';
+        html += ' <span style="font-size:10px;color:var(--muted)">'+t+'</span></div>';
+        html += '</div></a>';
+      });
+      body.innerHTML = html;
+      return;
+    }
+  }catch(e){}
+  
+  var html = '<div style="padding:14px">';
+  html += '<div style="font-size:11px;color:var(--muted);margin-bottom:10px">Portal berita crypto terpercaya:</div>';
+  portals.forEach(function(p){
+    html += '<a href="'+p[1]+'" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border2);text-decoration:none;">';
+    html += '<div><div style="font-size:12px;font-weight:600;color:var(--text)">'+p[0]+'</div>';
+    html += '<div style="font-size:11px;color:var(--muted)">'+p[2]+'</div></div>';
+    html += '<span style="color:var(--blue)">→</span></a>';
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+loadNews();
+setInterval(loadNews, 300000);
+</script>
 </body>
 </html>
