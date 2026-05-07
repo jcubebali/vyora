@@ -157,6 +157,22 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   .sidebar{transform:translateX(-100%);transition:transform 0.3s;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0 !important;}
+  
+  /* Modal responsive */
+  .modal-overlay{align-items:flex-end !important;padding:0 !important;}
+  .modal{border-radius:14px 14px 0 0 !important;max-height:90vh;overflow-y:auto;}
+  .modal-body{padding:16px !important;}
+  .modal-header{padding:14px 16px !important;}
+  
+  /* Pricing cards */
+  .pricing-grid{grid-template-columns:1fr !important;}
+  .pricing-card{padding:20px 16px !important;}
+  
+  /* Current plan */
+  .current-plan{flex-direction:column;align-items:flex-start !important;gap:12px;}
+  
+  /* Content padding */
+  .content{padding:16px !important;}
 }
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none;z-index:20;}
 .hamburger span{display:block;width:22px;height:2px;background:var(--text-bright);border-radius:2px;}
