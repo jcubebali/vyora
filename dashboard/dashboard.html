@@ -6,7 +6,7 @@
 <title>VYORA — Dashboard</title>
 <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/dbckdslrw/image/upload/v1777721734/Vyora_20260502_110933_0000_3_y1mk8l.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script>if(document.body)document.body.style.visibility='hidden';setTimeout(()=>{document.body&&(document.body.style.visibility='visible')},2000);</script>
+<script>if(document.body)document.body.style.visibility='hidden';setTimeout(()=>{document.body&&(document.body.style.visibility='visible')},5000);</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -697,7 +697,8 @@ const db=getFirestore(app);
 
 onAuthStateChanged(auth,async(u)=>{
   if(!u){window.location.replace('login.html');return;}
-  document.body.style.visibility='visible';
+  // Show body setelah semua data siap
+  setTimeout(()=>{ document.body.style.visibility='visible'; }, 100);
 
   try{
     const snap=await getDoc(doc(db,'users',u.uid));
