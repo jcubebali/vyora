@@ -178,7 +178,7 @@ window.doRegister=async()=>{
   catch(x){showErr(x.code==='auth/email-already-in-use'?'Email sudah terdaftar':x.message);b.disabled=false;b.textContent='Buat Akun Gratis';}
 };
 window.gLogin=async()=>{
-  try{const r=const gc=await signInWithPopup(auth,gp);await saveUser(gc.user);await saveUser(r.user);showOk('Login Google berhasil!');}
+  try{const gc=await signInWithPopup(auth,gp);await saveUser(gc.user);showOk('Login Google berhasil!');}
   catch(x){showErr('Gagal: '+x.message);}
 };
 window.sw=(t)=>{
