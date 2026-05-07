@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyora — Futures Trading</title>
+<link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/dbckdslrw/image/upload/v1777721734/Vyora_20260502_110933_0000_3_y1mk8l.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0C14;--bg2:#0E1018;--surface:#111420;
+  --border:#1E2235;--border2:#161828;
+  --text:#EEF0F8;--muted:#6B7190;--subtle:#3A3E55;
+  --blue:#5C7CFF;--purple:#9B6EF3;--green:#34D399;
+  --red:#F87171;--yellow:#FBBF24;
+  --ff:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace;--fd:'Bebas Neue',sans-serif;
+  --sidebar-w:220px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--ff);font-size:13px;}
+body{visibility:hidden;}
+.app{display:flex;height:100vh;overflow:hidden;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);z-index:99;}
+.overlay.show{display:block;opacity:1;}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .28s ease;}
+.logo{display:flex;align-items:center;gap:10px;padding:16px 14px;border-bottom:1px solid var(--border);}
+.logo-name{font-family:var(--fd);font-size:22px;letter-spacing:3px;}
+.logo-name span{color:var(--green);}
+.logo-ver{font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:1px;}
+.logo-close{display:none;margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;}
+.logo-close svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;}
+.nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.nav-section{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--subtle);padding:10px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:var(--muted);font-size:12px;font-weight:500;text-decoration:none;transition:all .18s;}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.nav-item.active{background:rgba(92,124,255,.1);color:var(--blue);border:1px solid rgba(92,124,255,.15);}
+.nav-item svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:rgba(52,211,153,.15);color:var(--green);font-family:var(--fm);font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;}
+.nav-lock{margin-left:auto;font-size:10px;opacity:.5;}
+.plan-badge{margin:auto 10px 10px;background:rgba(92,124,255,.06);border:1px solid rgba(92,124,255,.15);border-radius:10px;padding:10px 12px;}
+.plan-label{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--blue);}
+.plan-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.ham{display:none;flex-direction:column;justify-content:center;gap:5px;width:36px;height:36px;padding:6px;border:none;background:transparent;cursor:pointer;border-radius:8px;flex-shrink:0;}
+.ham span{display:block;height:2px;border-radius:2px;background:var(--muted);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.navbar{height:52px;background:rgba(14,16,24,.98);border-bottom:1px solid var(--border);display:flex;align-items:center;flex-shrink:0;gap:10px;padding:0 14px;}
+.page-title-bar{font-family:var(--fd);font-size:18px;letter-spacing:2px;flex:1;}
+.user-pill{display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);}
+.avatar{width:26px;height:26px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:11px;font-weight:700;color:#fff;}
+.u-name{font-size:12px;font-weight:600;}
+.u-plan{font-size:9px;color:var(--blue);}
+.content{flex:1;overflow-y:auto;padding:20px;}
+
+/* KPI */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:14px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.card-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.card-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;}
+.card-icon.blue{background:rgba(92,124,255,.15);color:var(--blue);}
+.card-icon.green{background:rgba(52,211,153,.15);color:var(--green);}
+.card-icon.purple{background:rgba(155,110,243,.15);color:var(--purple);}
+.card-icon.amber{background:rgba(251,191,36,.15);color:var(--yellow);}
+.card-title{font-size:11px;color:var(--muted);}
+.metric-val{font-family:var(--fd);font-size:24px;letter-spacing:.5px;margin-bottom:4px;}
+.metric-val.green{color:var(--green);}
+.metric-val.red{color:var(--red);}
+.metric-sub{font-size:11px;color:var(--muted);}
+.badge{font-family:var(--fm);font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.badge.green{background:rgba(52,211,153,.1);color:var(--green);border:1px solid rgba(52,211,153,.2);}
+.badge.red{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+.badge.blue{background:rgba(92,124,255,.1);color:var(--blue);border:1px solid rgba(92,124,255,.2);}
+
+/* POSITION CARD */
+.pos-card{background:var(--surface);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.pos-card.long{border:1px solid rgba(52,211,153,.3);box-shadow:0 0 20px rgba(52,211,153,.05);}
+.pos-card.short{border:1px solid rgba(248,113,113,.3);box-shadow:0 0 20px rgba(248,113,113,.05);}
+.pos-card.empty{border:1px solid var(--border2);}
+.pos-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2);}
+.pos-pair{font-family:var(--fd);font-size:18px;letter-spacing:1px;}
+.pos-side{font-family:var(--fd);font-size:14px;padding:4px 14px;border-radius:6px;}
+.pos-side.long{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.2);}
+.pos-side.short{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+.pos-body{padding:16px;}
+.pos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.pos-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.pos-item-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.pos-item-val{font-family:var(--fm);font-size:13px;font-weight:600;}
+.pos-item-val.green{color:var(--green);}
+.pos-item-val.red{color:var(--red);}
+.pos-item-val.blue{color:var(--blue);}
+.pos-item-val.yellow{color:var(--yellow);}
+.pos-levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.level-item{border-radius:8px;padding:10px;text-align:center;}
+.level-item.tp{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);}
+.level-item.sl{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);}
+.level-item.liq{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);}
+.level-label{font-size:9px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.level-label.tp{color:var(--green);}
+.level-label.sl{color:var(--red);}
+.level-label.liq{color:var(--yellow);}
+.level-val{font-family:var(--fm);font-size:12px;font-weight:600;}
+.pnl-bar-wrap{margin:14px 0 0;}
+.pnl-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:6px;}
+.pnl-bar-track{height:4px;background:var(--border);border-radius:99px;overflow:hidden;}
+.pnl-bar-fill{height:100%;border-radius:99px;transition:width .5s ease;}
+.empty-pos{text-align:center;padding:32px;color:var(--muted);}
+.empty-pos-icon{font-size:32px;margin-bottom:10px;}
+
+/* TABLE */
+.table-card{background:var(--surface);border:1px solid var(--border2);border-radius:10px;overflow:hidden;}
+.table-header{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+.table-title{font-family:var(--fd);font-size:16px;letter-spacing:1px;}
+table{width:100%;border-collapse:collapse;}
+th{padding:8px 14px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;text-align:left;background:rgba(0,0,0,.2);}
+td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border2);}
+tr:last-child td{border-bottom:none;}
+.mono{font-family:var(--fm);font-size:11px;}
+
+/* LIVE PILL */
+.live-pill{display:flex;align-items:center;gap:6px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);padding:4px 10px;border-radius:99px;font-family:var(--fm);font-size:10px;font-weight:600;color:var(--green);}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulseAnim 1.5s ease infinite;}
+@keyframes pulseAnim{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+
+/* FOOTER */
+footer{text-align:center;padding:16px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);flex-shrink:0;}
+
+/* MOBILE */
+@media(max-width:768px){
+  .sidebar{position:fixed;top:0;left:0;height:100%;transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .logo-close{display:flex;}
+  .ham{display:flex;}
+  .main{margin-left:0;}
+  .grid-4{grid-template-columns:1fr 1fr;}
+  .pos-grid{grid-template-columns:1fr 1fr;}
+  .pos-levels{grid-template-columns:1fr 1fr 1fr;}
+  .content{padding:12px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div style="flex:1">
+      <div class="logo-name">VYORA<span>.</span></div>
+      <div class="logo-ver">AI TRADING v5.0</div>
+    </div>
+    <button class="logo-close" id="sideClose" onclick="toggleSidebar()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Main</div>
+    <a href="dashboard.html" class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="signals.html" class="nav-item"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Sinyal Live<span class="nav-badge">LIVE</span></a>
+    <a href="trades.html" class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Riwayat Trade</a>
+    <div class="nav-section">Tools</div>
+    <a href="#" class="nav-item" id="nav-bot" onclick="checkAccess(event,'bot','Pro')"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Auto Bot<span class="nav-lock">🔒</span></a>
+    <a href="futures.html" class="nav-item active"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 22 6 22 12"/></svg>Futures Bot<span class="nav-badge">5x</span></a>
+    <a href="#" class="nav-item" id="nav-ai" onclick="checkAccess(event,'ai','Pro')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>AI Advisor<span class="nav-lock">🔒</span></a>
+    <a href="#" class="nav-item" id="nav-portfolio" onclick="checkAccess(event,'portfolio','Pro')"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>Portfolio<span class="nav-lock">🔒</span></a>
+    <a href="alerts.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Price Alerts</a>
+    <div class="nav-section">Account</div>
+    <a href="settings.html" class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 1.41 14.14M3.52 19.07a10 10 0 0 1 0-14.14"/></svg>Settings</a>
+    <a href="billing.html" class="nav-item"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Billing</a>
+    <a href="#" class="nav-item" onclick="logoutUser()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Logout</a>
+  </nav>
+  <div class="plan-badge">
+    <div class="plan-label" id="sidebar-plan">ELITE PLAN</div>
+    <div class="plan-sub" id="sidebar-plan-sub">Akses Penuh</div>
+  </div>
+  <a href="https://wa.me/62881037763388?text=Halo%20Vyora%20Support%2C%20saya%20butuh%20bantuan" target="_blank" style="display:flex;align-items:center;gap:8px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.2);color:#25d366;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;text-decoration:none;margin:8px 10px 10px;">
+    <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.134.558 4.133 1.535 5.867L.057 23.926l6.235-1.635A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.001-1.37l-.359-.213-3.714.974.99-3.623-.234-.372A9.818 9.818 0 1 1 12 21.818z"/></svg>
+    Hubungi Support
+  </a>
+</aside>
+
+<div class="main">
+  <div class="navbar">
+    <button class="ham" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+    <div class="page-title-bar">FUTURES BOT</div>
+    <div class="live-pill"><div class="pulse"></div>LIVE</div>
+    <div class="user-pill" style="margin-left:12px">
+      <div class="avatar" id="user-avatar">P</div>
+      <div><div class="u-name" id="user-name">Loading...</div><div class="u-plan" id="user-plan">--</div></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI -->
+    <div class="grid-4" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon blue"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <span class="card-title">Balance Futures</span>
+          </div>
+          <span class="badge blue">USDT</span>
+        </div>
+        <div class="metric-val" id="fut-balance">$--</div>
+        <div class="metric-sub">Available margin</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon green"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+            <span class="card-title">Total PnL Futures</span>
+          </div>
+        </div>
+        <div class="metric-val green" id="fut-pnl">+$--</div>
+        <div class="metric-sub" id="fut-pnl-sub">All time</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon purple"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg></div>
+            <span class="card-title">Win Rate</span>
+          </div>
+        </div>
+        <div class="metric-val" id="fut-winrate">--%</div>
+        <div class="metric-sub" id="fut-wr-sub">Loading...</div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="card-icon amber"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+            <span class="card-title">Leverage</span>
+          </div>
+        </div>
+        <div class="metric-val" style="color:var(--yellow)">5x</div>
+        <div class="metric-sub">USD-M Futures</div>
+      </div>
+    </div>
+
+    <!-- OPEN POSITION -->
+    <div id="pos-section">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- TRADE HISTORY -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">Riwayat Trade Futures</span>
+        <span class="badge blue" id="fut-trades-count">0</span>
+      </div>
+      <table>
+        <thead><tr><th>Pair</th><th>Side</th><th>Entry</th><th>Exit</th><th>PnL</th><th>Status</th></tr></thead>
+        <tbody id="fut-trades-body">
+          <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Belum ada riwayat trade futures</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <footer>© 2026 Vyora by J-CUBE &nbsp;|&nbsp; All Rights Reserved</footer>
+</div>
+</div>
+
+<script>
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+const planOrder={trial:0,basic:1,pro:2,elite:3};
+window.checkAccess=function(e,feature,required){
+  e.preventDefault();
+  const plan=localStorage.getItem('vyora_plan')||'trial';
+  if((planOrder[plan]||0)>=(planOrder[required.toLowerCase()]||2)){
+    const pages={bot:'bot.html',ai:'ai-chat.html',portfolio:'portfolio.html'};
+    if(pages[feature]) window.location.href=pages[feature];
+  } else {
+    alert('Fitur ini membutuhkan paket '+required+' atau lebih tinggi.');
+  }
+};
+setTimeout(()=>{if(document.body.style.visibility==='hidden')document.body.style.visibility='visible';},2000);
+</script>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getAuth,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,doc,getDoc,collection,query,where,orderBy,limit,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app=initializeApp({apiKey:"AIzaSyAmfMQnx-ZkP1e0BkD68d3lvIY5FFv8Rck",authDomain:"nexus-trade-e449e.firebaseapp.com",projectId:"nexus-trade-e449e"});
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+function renderPosition(fp){
+  const sec=document.getElementById('pos-section');
+  if(!fp||fp.status==='CLOSED'||!fp.symbol){
+    sec.innerHTML=`<div class="pos-card empty" style="margin-bottom:16px"><div class="empty-pos"><div class="empty-pos-icon">📭</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">Tidak Ada Posisi Open</div><div style="font-size:12px;color:var(--muted)">Bot akan entry otomatis saat signal kuat</div></div></div>`;
+    return;
+  }
+  const isLong=fp.side==='LONG';
+  const pnl=parseFloat(fp.pnlUsdt||0);
+  const pnlPct=parseFloat(fp.pnlPct||0);
+  const liq=isLong?fp.entry*(1-1/fp.leverage*0.9):fp.entry*(1+1/fp.leverage*0.9);
+  const pnlProg=Math.min(Math.abs(pnlPct)/3*100,100);
+  sec.innerHTML=`
+    <div class="pos-card ${isLong?'long':'short'}" style="margin-bottom:16px">
+      <div class="pos-header">
+        <div>
+          <div class="pos-pair">${fp.symbol.replace('USDT','')}<span style="color:var(--muted);font-weight:400">/USDT</span></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">Futures · ${fp.leverage||5}x Leverage</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pos-side ${isLong?'long':'short'}">${isLong?'↑ LONG':'↓ SHORT'}</span>
+          <div class="live-pill"><div class="pulse"></div>LIVE</div>
+        </div>
+      </div>
+      <div class="pos-body">
+        <div class="pos-grid">
+          <div class="pos-item">
+            <div class="pos-item-label">Entry Price</div>
+            <div class="pos-item-val blue">$${parseFloat(fp.entry||0).toLocaleString('en',{minimumFractionDigits:2})}</div>
+          </div>
+          <div class="pos-item">
+            <div class="pos-item-label">Current Price</div>
+            <div class="pos-item-val">$${parseFloat(fp.current||0).toLocaleString('en',{minimumFractionDigits:2})}</div>
+          </div>
+          <div class="pos-item">
+            <div class="pos-item-label">Unrealized PnL</div>
+            <div class="pos-item-val ${pnl>=0?'green':'red'}">${pnl>=0?'+':''}$${pnl.toFixed(4)}</div>
+          </div>
+          <div class="pos-item">
+            <div class="pos-item-label">PnL %</div>
+            <div class="pos-item-val ${pnlPct>=0?'green':'red'}">${pnlPct>=0?'+':''}${pnlPct.toFixed(2)}%</div>
+          </div>
+        </div>
+        <div class="pos-levels">
+          <div class="level-item tp">
+            <div class="level-label tp">Take Profit</div>
+            <div class="level-val" style="color:var(--green)">$${parseFloat(fp.tp||0).toLocaleString('en',{minimumFractionDigits:2})}</div>
+          </div>
+          <div class="level-item sl">
+            <div class="level-label sl">Stop Loss</div>
+            <div class="level-val" style="color:var(--red)">$${parseFloat(fp.sl||0).toLocaleString('en',{minimumFractionDigits:2})}</div>
+          </div>
+          <div class="level-item liq">
+            <div class="level-label liq">Liquidation</div>
+            <div class="level-val" style="color:var(--yellow)">~$${liq.toLocaleString('en',{minimumFractionDigits:0})}</div>
+          </div>
+        </div>
+        <div class="pnl-bar-wrap">
+          <div class="pnl-bar-label"><span>SL</span><span>${pnl>=0?'+':''}${pnlPct.toFixed(2)}%</span><span>TP</span></div>
+          <div class="pnl-bar-track"><div class="pnl-bar-fill" style="width:${pnlProg}%;background:${pnl>=0?'var(--green)':'var(--red)'}"></div></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+onAuthStateChanged(auth,async(u)=>{
+  if(!u){window.location.replace('login.html');return;}
+  document.body.style.visibility='visible';
+
+  try{
+    const snap=await getDoc(doc(db,'users',u.uid));
+    if(!snap.exists()) return;
+    const d=snap.data();
+
+    // User info
+    const nm=document.getElementById('user-name');
+    const pl=document.getElementById('user-plan');
+    const av=document.getElementById('user-avatar');
+    const spl=document.getElementById('sidebar-plan');
+    if(nm) nm.textContent=d.name||u.displayName||u.email.split('@')[0];
+    if(pl) pl.textContent=(d.plan||'trial').toUpperCase();
+    if(av){
+      const parts=(d.name||u.displayName||'U').trim().split(' ');
+      av.textContent=(parts.length>=2?parts[0][0]+parts[1][0]:parts[0].substring(0,2)).toUpperCase();
+    }
+    if(spl) spl.textContent=(d.plan||'trial').toUpperCase()+' PLAN';
+    localStorage.setItem('vyora_plan',d.plan||'trial');
+
+    // Futures stats
+    const fp=d.futuresPosition||{};
+    renderPosition(fp);
+
+    // Futures PnL dari trades
+    const futBal=document.getElementById('fut-balance');
+    const futPnl=document.getElementById('fut-pnl');
+    const futWr=document.getElementById('fut-winrate');
+    const futWrSub=document.getElementById('fut-wr-sub');
+
+    // Real-time updates
+    setInterval(async()=>{
+      try{
+        const s=await getDoc(doc(db,'users',u.uid));
+        if(s.exists()){
+          const dd=s.data();
+          renderPosition(dd.futuresPosition||{});
+        }
+      }catch(e){}
+    },15000);
+
+    // Load futures trades
+    try{
+      const q=query(collection(db,'trades'),
+        where('uid','==',u.uid),
+        where('side','in',['LONG','SHORT']),
+        orderBy('timestamp','desc'),
+        limit(50));
+      onSnapshot(q,(snap)=>{
+        const tbody=document.getElementById('fut-trades-body');
+        const countBadge=document.getElementById('fut-trades-count');
+        if(countBadge) countBadge.textContent=snap.size;
+        if(snap.empty){
+          tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">Belum ada riwayat trade futures</td></tr>';
+          // Hitung stats
+          if(futBal) futBal.textContent='$'+parseFloat(d.totalUsdt||0).toFixed(2);
+          if(futPnl){futPnl.textContent='+$0.0000';futPnl.className='metric-val green';}
+          if(futWr) futWr.textContent='0%';
+          if(futWrSub) futWrSub.textContent='0 Win · 0 Loss';
+          return;
+        }
+        let wins=0, losses=0, totalPnl=0;
+        tbody.innerHTML='';
+        snap.forEach(d=>{
+          const t=d.data();
+          const pnl=parseFloat(t.pnlUsdt||0);
+          if(pnl>=0) wins++; else losses++;
+          totalPnl+=pnl;
+          const isWin=pnl>=0;
+          const row=document.createElement('tr');
+          row.innerHTML=
+            '<td class="mono">'+(t.symbol||'BTCUSDT')+'</td>'+
+            '<td><span style="color:'+(t.side==='LONG'?'var(--green)':'var(--red)')+'">'+
+            (t.side==='LONG'?'↑ LONG':'↓ SHORT')+'</span></td>'+
+            '<td class="mono">$'+parseFloat(t.entryPrice||0).toLocaleString('en',{minimumFractionDigits:2})+'</td>'+
+            '<td class="mono">$'+parseFloat(t.exitPrice||0).toLocaleString('en',{minimumFractionDigits:2})+'</td>'+
+            '<td class="mono" style="color:'+(isWin?'var(--green)':'var(--red)')+'">'+(isWin?'+':'')+pnl.toFixed(4)+'</td>'+
+            '<td><span style="background:'+(isWin?'rgba(52,211,153,.1)':'rgba(248,113,113,.1)')+';color:'+(isWin?'var(--green)':'var(--red)')+';padding:2px 8px;border-radius:4px;font-size:10px">'+(isWin?'WIN':'LOSS')+'</span></td>';
+          tbody.appendChild(row);
+        });
+        const total=wins+losses;
+        const wr=total>0?(wins/total*100).toFixed(0):0;
+        if(futBal) futBal.textContent='$'+parseFloat(d.totalUsdt||0).toFixed(2);
+        if(futPnl){futPnl.textContent=(totalPnl>=0?'+':'')+'$'+totalPnl.toFixed(4);futPnl.className='metric-val '+(totalPnl>=0?'green':'red');}
+        if(futWr) futWr.textContent=wr+'%';
+        if(futWrSub) futWrSub.textContent=wins+' Win · '+losses+' Loss';
+      });
+    }catch(e){console.error('Futures trades:',e);}
+
+  }catch(e){console.error('Firestore:',e);}
+
+  window.logoutUser=async()=>{await signOut(auth);window.location.href='login.html';};
+});
+</script>
+</body>
+</html>
