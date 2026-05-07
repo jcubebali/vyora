@@ -926,7 +926,7 @@ async function loadNews(){
       const ago = Math.floor((Date.now()-n.updated_at*1000)/60000);
       const t = ago<60?ago+' mnt lalu':Math.floor(ago/60)+' jam lalu';
       html += '<a href="'+n.url+'" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;">';
-      if(n.thumb_2x) html += '<img src="'+n.thumb_2x+'" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">';
+      if(n.thumb_2x) html += '<img src="'+n.thumb_2x+'" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.remove()">';
       html += '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+n.title+'</div>';
       html += '<div style="display:flex;gap:8px"><span style="font-size:10px;color:var(--blue)">'+(n.news_site||'Crypto')+'</span><span style="font-size:10px;color:var(--muted)">'+t+'</span></div></div></a>';
     });
