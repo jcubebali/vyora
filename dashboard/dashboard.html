@@ -920,64 +920,32 @@ async function loadNews(){
   try{
     const r = await fetch('https://api.coingecko.com/api/v3/news?per_page=8');
     const data = await r.json();
-    if(!data.data || !data.data.length){
-      body.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Tidak ada berita</div>';
-      return;
-    }
-    body.innerHTML = data.data.map(n=>{
-      const time = new Date(n.updated_at*1000);
-      const ago = Math.floor((Date.now()-time)/60000);
-      const timeStr = ago<60?ago+' mnt lalu':ago<1440?Math.floor(ago/60)+' jam lalu':Math.floor(ago/1440)+' hari lalu';
-      return `<a href="${n.url}" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
-        ${n.thumb_2x?`<img src="${n.thumb_2x}" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">`:'' }
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${n.title}</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:10px;color:var(--blue)">${n.news_site||'Crypto News'}</span>
-            <span style="font-size:10px;color:var(--muted)">${timeStr}</span>
-          </div>
-        </div>
-      </a>`;
-    }).join('');
-    return;
-  }catch(e){}
-  
-  // Fallback: tampilkan link manual ke portal berita
-  body.innerHTML=\`
-    <div style="padding:14px">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Portal berita crypto terpercaya:</div>
-      \${[
-        {name:'CoinDesk', url:'https://coindesk.com', desc:'Berita & analisa terkini'},
-        {name:'CoinTelegraph', url:'https://cointelegraph.com', desc:'Update cepat & mendalam'},
-        {name:'The Block', url:'https://theblock.co', desc:'Analisa institusional'},
-        {name:'Decrypt', url:'https://decrypt.co', desc:'Bahasa mudah dipahami'},
-      ].map(n=>\`<a href="\${n.url}" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border2);text-decoration:none;">
-        <div><div style="font-size:12px;font-weight:600;color:var(--text)">\${n.name}</div><div style="font-size:11px;color:var(--muted)">\${n.desc}</div></div>
-        <span style="color:var(--blue);font-size:11px">→</span>
-      </a>\`).join('')}
-    </div>\`;
-    if(!data.items || !data.items.length){
-      body.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Tidak ada berita</div>';
-      return;
-    }
-    body.innerHTML = data.items.map(n=>{
-      const time = new Date(n.pubDate);
-      const ago = Math.floor((Date.now()-time)/60000);
-      const timeStr = ago<60?ago+' menit lalu':ago<1440?Math.floor(ago/60)+' jam lalu':Math.floor(ago/1440)+' hari lalu';
-      const img = n.thumbnail || n.enclosure?.link || '';
-      return `<a href="${n.link}" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'">
-        ${img?`<img src="${img}" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">`:'' }
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${n.title}</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:10px;color:var(--blue)">CoinDesk</span>
-            <span style="font-size:10px;color:var(--muted)">${timeStr}</span>
-          </div>
-        </div>
-      </a>`;
-    }).join('');
+    if(!data.data||!data.data.length) throw new Error('no data');
+    let html = '';
+    data.data.forEach(n=>{
+      const ago = Math.floor((Date.now()-n.updated_at*1000)/60000);
+      const t = ago<60?ago+' mnt lalu':Math.floor(ago/60)+' jam lalu';
+      html += '<a href="'+n.url+'" target="_blank" style="display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border2);text-decoration:none;">';
+      if(n.thumb_2x) html += '<img src="'+n.thumb_2x+'" style="width:56px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.style.display='none'">';
+      html += '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+n.title+'</div>';
+      html += '<div style="display:flex;gap:8px"><span style="font-size:10px;color:var(--blue)">'+(n.news_site||'Crypto')+'</span><span style="font-size:10px;color:var(--muted)">'+t+'</span></div></div></a>';
+    });
+    body.innerHTML = html;
   }catch(e){
-    body.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Gagal memuat berita</div>';
+    const portals = [
+      ['CoinDesk','https://coindesk.com','Berita & analisa terkini'],
+      ['CoinTelegraph','https://cointelegraph.com','Update cepat & mendalam'],
+      ['The Block','https://theblock.co','Analisa institusional'],
+      ['Decrypt','https://decrypt.co','Bahasa mudah dipahami']
+    ];
+    let html = '<div style="padding:14px"><div style="font-size:11px;color:var(--muted);margin-bottom:12px">Portal berita crypto:</div>';
+    portals.forEach(p=>{
+      html += '<a href="'+p[1]+'" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border2);text-decoration:none;">';
+      html += '<div><div style="font-size:12px;font-weight:600;color:var(--text)">'+p[0]+'</div><div style="font-size:11px;color:var(--muted)">'+p[2]+'</div></div>';
+      html += '<span style="color:var(--blue);font-size:11px">→</span></a>';
+    });
+    html += '</div>';
+    body.innerHTML = html;
   }
 }
 loadNews();
