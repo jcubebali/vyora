@@ -542,7 +542,7 @@ window.checkAccess=function(e,feature,required){
   const plan=localStorage.getItem('vyora_plan')||'trial';
   const reqLevel=planOrder[required.toLowerCase()]||2;
   if((planOrder[plan]||0)>=reqLevel){
-    const pages={bot:'bot.html',ai:'ai-chat.html',portfolio:'portfolio.html'};
+    const pages={bot:'bot.html',ai:'ai-chat.html',portfolio:'portfolio.html',futures:'futures.html'};
     if(pages[feature]) window.location.href=pages[feature];
   } else {
     document.getElementById('lock-title').textContent='Fitur '+required+' Plan';
